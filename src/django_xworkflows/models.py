@@ -13,6 +13,7 @@ from xworkflows import base
 
 
 Workflow = base.Workflow
+AbortTransition = base.AbortTransition
 
 
 class StateField(models.CharField):
