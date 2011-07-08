@@ -23,6 +23,8 @@ setup(
         package_dir = {'': 'src'},
         packages = ['django_xworkflows'],
         long_description=read('README.rst'),
+        install_requires = ['xworkflows', 'django >=1.3'],
+        tests_require = ['unittest2'],
         classifiers=[
             "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
