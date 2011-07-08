@@ -45,7 +45,7 @@ class StateField(models.CharField):
                 try:
                     state = self.workflow.states[value]
                 except KeyError:
-                    raise ValidationError(self.error_messages['invalid'])
+                    raise exceptions.ValidationError(self.error_messages['invalid'])
             res = base.StateField(state, self.workflow)
 
         if res.state not in self.workflow.states:
