@@ -12,6 +12,9 @@ from django.utils.translation import ugettext_lazy as _
 from xworkflows import base
 
 
+Workflow = base.Workflow
+
+
 class StateField(models.CharField):
     default_error_messages = {
         'invalid': _(u"Choose a valid state."),

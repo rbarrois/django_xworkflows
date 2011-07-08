@@ -54,8 +54,6 @@ class ModelTestCase(unittest.TestCase):
         data = serializers.serialize('json',
                 models.MyWorkflowEnabled.objects.filter(pk=o.id))
 
-        print data
-
         models.MyWorkflowEnabled.objects.all().delete()
 
         for obj in serializers.deserialize('json', data):
