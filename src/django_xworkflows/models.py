@@ -16,6 +16,8 @@ Workflow = base.Workflow
 
 
 class StateField(models.CharField):
+    """Holds the current state of a WorkflowEnabled object."""
+
     default_error_messages = {
         'invalid': _(u"Choose a valid state."),
     }
@@ -70,6 +72,7 @@ class StateField(models.CharField):
 
 
 class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
+    """Metaclass for WorkflowEnabled objects."""
 
     @classmethod
     def _add_workflow(mcs, workflow, state_field, attrs):
@@ -82,15 +85,18 @@ class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
 
 
 class WorkflowEnabled(base.BaseWorkflowEnabled, models.Model):
+    """Base class for all django models wishing to use a Workflow."""
     __metaclass__ = WorkflowEnabledMeta
 
 
 class ImplementationList(base.ImplementationList):
+    """Internal; list of implementations for a workflow."""
     def _add_implem(cls, attrs, attrname, implem):
         attrs[attrname] = TransitionImplementation.copy_from(implem)
 
 
 class TransitionImplementation(base.TransitionImplementation):
+    """Internal; wraps the implementation of a transition for a workflow."""
 
     @classmethod
     def copy_from(cls, implem):
