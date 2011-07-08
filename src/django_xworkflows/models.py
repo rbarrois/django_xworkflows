@@ -12,6 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 from xworkflows import base
 
 
+State = base.State
 Workflow = base.Workflow
 AbortTransition = base.AbortTransition
 
