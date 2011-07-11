@@ -86,7 +86,7 @@ class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
                                             state_field=state_field)
 
 
-class WorkflowEnabled(base.BaseWorkflowEnabled, models.Model):
+class WorkflowEnabled(base.BaseWorkflowEnabled):
     """Base class for all django models wishing to use a Workflow."""
     __metaclass__ = WorkflowEnabledMeta
 
@@ -100,15 +100,20 @@ class ImplementationList(base.ImplementationList):
 class TransitionImplementation(base.TransitionImplementation):
     """Internal; wraps the implementation of a transition for a workflow."""
 
+    extra_kwargs = {'log': True, 'save': True, 'user': None}
+
     @classmethod
     def copy_from(cls, implem):
         return cls(implem.transition, implem.field_name, implem.implementation)
 
-    def _call_implem(self, instance, save=True, log=True, user=None, *args, **kwargs):
-        return super(TransitionImplementation, self)._call_implem(instance, *args, **kwargs)
+    def _call_implem(self, instance, cls_kwargs, *args, **kwargs):
+        return super(TransitionImplementation, self)._call_implem(instance, cls_kwargs, *args, **kwargs)
 
-    def _post_transition(self, instance, res, save=True, log=True, user=None, *args, **kwargs):
-        super(TransitionImplementation, self)._post_transition(instance, res, *args, **kwargs)
+    def _post_transition(self, instance, res, cls_kwargs, *args, **kwargs):
+        save = cls_kwargs['save']
+        log = cls_kwargs['log']
+        user = cls_kwargs['user']
+        super(TransitionImplementation, self)._post_transition(instance, res, cls_kwargs, *args, **kwargs)
         if save:
             instance.save()
         if log:
