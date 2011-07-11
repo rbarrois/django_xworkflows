@@ -100,6 +100,16 @@ class TransitionTestCase(unittest.TestCase):
 
         self.assertRaises(xworkflows.InvalidTransitionError, self.obj.bazbar)
 
+    def test_custom_transition_by_kw(self):
+        self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
+        self.obj.foobar()
+        self.assertEqual('abab', self.obj.gobaz(foo='ab'))
+
+    def test_custom_transition_no_kw(self):
+        self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
+        self.obj.foobar()
+        self.assertEqual('abab', self.obj.gobaz('ab'))
+
     def test_logging(self):
         xwf_models.TransitionLog.objects.all().delete()
 

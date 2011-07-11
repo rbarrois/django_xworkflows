@@ -31,6 +31,9 @@ class MyAltWorkflow(xworkflows.Workflow):
 class MyWorkflowEnabled(models.WorkflowEnabled, djmodels.Model):
     state = MyWorkflow
 
+    def gobaz(self, foo):
+        return foo * 2
+
 
 class WithTwoWorkflows(models.WorkflowEnabled, djmodels.Model):
     state1 = MyWorkflow
