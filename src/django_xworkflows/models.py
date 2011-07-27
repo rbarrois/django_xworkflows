@@ -6,6 +6,8 @@ from django.conf import settings
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes import models as ct_models
 from django.core import exceptions
+from django.forms import fields
+from django.forms import widgets
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -17,11 +19,26 @@ Workflow = base.Workflow
 AbortTransition = base.AbortTransition
 
 
-class StateField(models.CharField):
+class StateSelect(widgets.Select):
+
+    def render(self, name, value, attrs=None, choices=()):
+        if isinstance(value, base.StateField):
+            state_name = value.state.name
+        elif isinstance(value, base.State):
+            state_name = value.name
+        else:
+            state_name = str(value)
+        return super(StateSelect, self).render(name, state_name, attrs, choices)
+
+
+class StateField(models.Field):
     """Holds the current state of a WorkflowEnabled object."""
 
     default_error_messages = {
         'invalid': _(u"Choose a valid state."),
+        'wrong_type': _(u"Please enter a valid input (got %r)."),
+        'wrong_workflow': _(u"Please enter a value from the right workflow (got %r)."),
+        'invalid_state': _(u"%s is not a valid state."),
     }
     description = _(u"State")
 
@@ -71,6 +88,23 @@ class StateField(models.CharField):
     def value_to_string(self, obj):
         statefield = self.to_python(self._get_val_from_obj(obj))
         return statefield.state.name
+
+    def validate(self, value, model_instance):
+        """Validate that a given value is a valid option for a given model instance.
+
+        Args:
+            value (xworkflows.base.StateField): The base.StateField returned by to_python.
+            model_instance: A WorkflowEnabled instance
+        """
+        if not isinstance(value, base.StateField):
+            raise exceptions.ValidationError(self.error_messages['wrong_type'] % value)
+        elif not value.workflow == self.workflow:
+            raise exceptions.ValidationError(self.error_messages['wrong_workflow'] % value.workflow)
+        elif not value.state in self.workflow.states:
+            raise exceptions.ValidationError(self.error_messages['invalid_state'] % value.state)
+
+    def formfield(self, form_class=fields.ChoiceField, widget=StateSelect, **kwargs):
+        return super(StateField, self).formfield(form_class, widget=widget, **kwargs)
 
 
 class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
