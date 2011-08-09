@@ -31,6 +31,30 @@ class StateSelect(widgets.Select):
         return super(StateSelect, self).render(name, state_name, attrs, choices)
 
 
+class StateFieldProperty(object):
+    """Property-like attribute for WorkflowEnabled classes.
+
+    Similar to django.db.models.fields.subclassing.Creator, but doesn't raise
+    AttributeError.
+    """
+    def __init__(self, field):
+        self.field = field
+
+    def __get__(self, instance, owner):
+        """Retrieve the related attributed from a class / an instance.
+
+        If retrieving from an instance, return the actual value; if retrieving
+        from a class, return the workflow.
+        """
+        if instance:
+            return instance.__dict__.get(self.field.name, self.field.workflow.initial_state)
+        else:
+            return self.field.workflow
+
+    def __set__(self, instance, value):
+        instance.__dict__[self.field.name] = self.field.to_python(value)
+
+
 class StateField(models.Field):
     """Holds the current state of a WorkflowEnabled object."""
 
@@ -41,8 +65,6 @@ class StateField(models.Field):
         'invalid_state': _(u"%s is not a valid state."),
     }
     description = _(u"State")
-
-    __metaclass__ = models.SubfieldBase
 
     def __init__(self, workflow, **kwargs):
         self.workflow = workflow
@@ -55,6 +77,10 @@ class StateField(models.Field):
 
     def get_internal_type(self):
         return "CharField"
+
+    def contribute_to_class(self, cls, name):
+        super(StateField, self).contribute_to_class(cls, name)
+        setattr(cls, self.name, StateFieldProperty(self))
 
     def to_python(self, value):
         """Converts the DB-stored value into a Python value."""

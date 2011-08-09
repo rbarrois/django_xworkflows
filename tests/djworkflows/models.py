@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models as djmodels
 
 import xworkflows

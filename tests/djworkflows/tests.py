@@ -26,6 +26,9 @@ class ModelTestCase(unittest.TestCase):
         o = models.MyWorkflowEnabled()
         self.assertEqual(models.MyWorkflow.states['foo'], o.state)
 
+    def test_class_attribute(self):
+        self.assertEqual(models.MyWorkflow, models.MyWorkflowEnabled.state.__class__)
+
     def test_setting_state(self):
         o = models.MyWorkflowEnabled()
         self.assertEqual(models.MyWorkflow.states['foo'], o.state)
