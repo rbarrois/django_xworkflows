@@ -8,7 +8,7 @@ from django.contrib.contenttypes import models as ct_models
 from django.core import exceptions
 from django.forms import fields
 from django.forms import widgets
-
+from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 
 from xworkflows import base
@@ -68,7 +68,7 @@ class StateField(models.Field):
 
     def __init__(self, workflow, **kwargs):
         self.workflow = workflow
-        kwargs['choices'] = ((st.name, st.title) for st in self.workflow.states)
+        kwargs['choices'] = list((st.name, st.title) for st in self.workflow.states)
         kwargs['max_length'] = max(len(st.name) for st in self.workflow.states)
         kwargs['blank'] = False
         kwargs['null'] = False
@@ -149,6 +149,13 @@ class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
 class WorkflowEnabled(base.BaseWorkflowEnabled):
     """Base class for all django models wishing to use a Workflow."""
     __metaclass__ = WorkflowEnabledMeta
+
+    def _get_FIELD_display(self, field):
+        if isinstance(field, StateField):
+            value = getattr(self, field.attname)
+            return force_unicode(value.title)
+        else:
+            return super(WorkflowEnabled, self)._get_FIELD_display(field)
 
 
 class ImplementationList(base.ImplementationList):
