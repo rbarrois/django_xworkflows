@@ -60,7 +60,7 @@ class StateField(models.Field):
 
     default_error_messages = {
         'invalid': _(u"Choose a valid state."),
-        'wrong_type': _(u"Please enter a valid input (got %r)."),
+        'wrong_type': _(u"Please enter a valid value (got %r)."),
         'wrong_workflow': _(u"Please enter a value from the right workflow (got %r)."),
         'invalid_state': _(u"%s is not a valid state."),
     }
@@ -193,7 +193,8 @@ class TransitionLog(models.Model):
     """The log for a transition.
 
     Attributes:
-        obj (django.db.model.Model): the object affected by this transition.
+        modified_object (django.db.model.Model): the object affected by this
+            transition.
         transition (str): The name of the transition being performed.
         user (django.contrib.auth.user): the user performing the transition; the
             actual model to use here is defined in the XWORKFLOWS_USER_MODEL
@@ -206,16 +207,19 @@ class TransitionLog(models.Model):
                                      related_name="workflow_object",
                                      blank=True, null=True)
     content_id = models.PositiveIntegerField(_(u"Content id"), blank=True, null=True)
-    obj = generic.GenericForeignKey(ct_field="content_type", fk_field="content_id")
+    modified_object = generic.GenericForeignKey(
+            ct_field="content_type",
+            fk_field="content_id")
 
-    transition = models.CharField(max_length=255)
+    transition = models.CharField(_(u"transition"), max_length=255)
     user = models.ForeignKey(
         getattr(settings, 'XWORKFLOWS_USER_MODEL', 'auth.User'),
         blank=True,
-        null=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
+        null=True,
+        verbose_name=_(u"author"))
+    timestamp = models.DateTimeField(_(u"performed at"), auto_now_add=True)
 
     class Meta:
         ordering = ('timestamp', 'user', 'transition')
-
-
+        verbose_name = _(u'XWorkflow transition log')
+        verbose_name_plural = _(u'XWorkflow transition logs')
