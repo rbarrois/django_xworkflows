@@ -120,7 +120,7 @@ class TransitionTestCase(unittest.TestCase):
         self.obj.foobar(save=False)
 
         trlog = xwf_models.TransitionLog.objects.all()[0]
-        self.assertEqual(self.obj, trlog.obj)
+        self.assertEqual(self.obj, trlog.modified_object)
         self.assertEqual('foobar', trlog.transition)
         self.assertEqual(None, trlog.user)
 

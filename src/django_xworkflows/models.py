@@ -184,7 +184,7 @@ class TransitionImplementation(base.TransitionImplementation):
         if save:
             instance.save()
         if log:
-            TransitionLog.objects.create(obj=instance,
+            TransitionLog.objects.create(modified_object=instance,
                                          transition=self.transition.name,
                                          user=user)
 
