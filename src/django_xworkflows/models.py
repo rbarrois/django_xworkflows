@@ -133,6 +133,21 @@ class StateField(models.Field):
         return super(StateField, self).formfield(form_class, widget=widget, **kwargs)
 
 
+    try:
+        import south
+    except ImportError:
+        pass
+    else:
+        def south_field_triple(self):
+            """Return a suitable description of this field for South."""
+            workflow_class = type(self.workflow)
+            workflow = ("__import__('%(mod)s', globals(), locals(), '%(cls)s').%(cls)s"
+                    % {'mod': workflow_class.__module__, 'cls': workflow_class.__name__})
+            from south.modelsinspector import introspector
+            args, kwargs = introspector(self)
+            return ('django_xworkflows.models.StateField', [workflow] + args, kwargs)
+
+
 class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
     """Metaclass for WorkflowEnabled objects."""
 
