@@ -235,6 +235,6 @@ class TransitionLog(models.Model):
     timestamp = models.DateTimeField(_(u"performed at"), auto_now_add=True)
 
     class Meta:
-        ordering = ('timestamp', 'user', 'transition')
+        ordering = ('-timestamp', 'user', 'transition')
         verbose_name = _(u'XWorkflow transition log')
         verbose_name_plural = _(u'XWorkflow transition logs')
