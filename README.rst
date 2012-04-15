@@ -8,9 +8,7 @@ Django-XWorkflows allow to bind a Django model to a workflow, with a few extra f
 - Auto-save after transitions
 - Log each action into the database
 
-Define a workflow and add it to a model:
-
-.. sourcecode:: python
+Define a workflow and add it to a model::
 
     from django_xworkflows import models as xwf_models
 
@@ -28,9 +26,7 @@ Define a workflow and add it to a model:
 
         state = xwf_models.StateField(MyWorkflow)
 
-Use the workflow:
-
-.. sourcecode:: pycon
+Use the workflow::
 
     >>> obj = MyModel()
     >>> obj.state  # Defaults to the initial_state
