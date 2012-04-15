@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-15 17:33+0200\n"
+"POT-Creation-Date: 2012-04-15 17:54+0200\n"
 "PO-Revision-Date: 2011-09-12 20:43+0200\n"
 "Last-Translator: Raphaël Barrois <raphael.barrois@xelmail.com>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -51,18 +51,26 @@ msgstr "ID du contenu"
 msgid "transition"
 msgstr "transition"
 
-#: xworkflow_log/models.py:35
+#: xworkflow_log/models.py:33
+msgid "from state"
+msgstr "depuis l'état"
+
+#: xworkflow_log/models.py:34
+msgid "to state"
+msgstr "pour l'état"
+
+#: xworkflow_log/models.py:37
 msgid "author"
 msgstr "auteur"
 
-#: xworkflow_log/models.py:36
+#: xworkflow_log/models.py:38
 msgid "performed at"
 msgstr "effectuée à"
 
-#: xworkflow_log/models.py:40
+#: xworkflow_log/models.py:42
 msgid "XWorkflow transition log"
 msgstr "log de transition (XWorkflow)"
 
-#: xworkflow_log/models.py:41
+#: xworkflow_log/models.py:43
 msgid "XWorkflow transition logs"
 msgstr "logs de transition (XWorkflow)"
