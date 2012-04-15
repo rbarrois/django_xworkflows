@@ -82,7 +82,7 @@ Resources
 
 * Package on PyPI: http://pypi.python.org/pypi/django-xworkflows
 * Repository and issues on GitHub: http://github.com/rbarrois/django-xworkflows
-* Doc on http://readthedocs.org/doc/django-xworkflows/
+* Doc on http://readthedocs.org/docs/django-xworkflows/
 * XWorkflows on GitHub: http://github.com/rbarrois/xworkflows
 
 Indices and tables
