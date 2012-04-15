@@ -79,6 +79,10 @@ class StateField(models.Field):
         return "CharField"
 
     def contribute_to_class(self, cls, name):
+        """Contribute the state to a Model.
+
+        Attaches a StateFieldProperty to wrap the attribute.
+        """
         super(StateField, self).contribute_to_class(cls, name)
         setattr(cls, self.name, StateFieldProperty(self))
 
@@ -104,14 +108,26 @@ class StateField(models.Field):
         return res
 
     def get_prep_value(self, value):
+        """Prepares a value.
+
+        Returns a State object.
+        """
         return self.to_python(value)
 
     def get_db_prep_value(self, value, connection, prepared=False):
+        """Convert a value to DB storage.
+
+        Returns the state name.
+        """
         if not prepared:
             value = self.get_prep_value(value)
         return value.state.name
 
     def value_to_string(self, obj):
+        """Convert a field value to a string.
+
+        Returns the state name.
+        """
         statefield = self.to_python(self._get_val_from_obj(obj))
         return statefield.state.name
 
