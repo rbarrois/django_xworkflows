@@ -1,14 +1,16 @@
 Django-XWorkflows
 =================
 
-Use `XWorkflows <http://github.com/rbarrois/xworkflows/`_ along with Django models.
+Use `XWorkflows <http://github.com/rbarrois/xworkflows/>`_ along with Django models.
 
 Django-XWorkflows allow to bind a Django model to a workflow, with a few extra features:
 
 - Auto-save after transitions
 - Log each action into the database
 
-Define a workflow and add it to a model::
+Define a workflow and add it to a model:
+
+.. sourcecode:: python
 
     from django_xworkflows import models as xwf_models
 
@@ -26,7 +28,9 @@ Define a workflow and add it to a model::
 
         state = xwf_models.StateField(MyWorkflow)
 
-Use the workflow::
+Use the workflow:
+
+.. sourcecode:: pycon
 
     >>> obj = MyModel()
     >>> obj.state  # Defaults to the initial_state
