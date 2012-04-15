@@ -15,7 +15,6 @@ from xworkflows import base
 
 
 State = base.State
-Workflow = base.Workflow
 AbortTransition = base.AbortTransition
 
 
@@ -169,12 +168,11 @@ class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
 
     @classmethod
     def _add_workflow(mcs, workflow, state_field, attrs):
-        attrs[state_field] = StateField(workflow)
+        """Attach the workflow to a set of attributes.
 
-    @classmethod
-    def _copy_implems(mcs, workflow, state_field):
-        return ImplementationList.copy_from(workflow.implementations,
-                                            state_field=state_field)
+        This sets the django-specific StateField.
+        """
+        attrs[state_field] = StateField(workflow)
 
 
 class WorkflowEnabled(base.BaseWorkflowEnabled):
@@ -189,35 +187,20 @@ class WorkflowEnabled(base.BaseWorkflowEnabled):
             return super(WorkflowEnabled, self)._get_FIELD_display(field)
 
 
-class ImplementationList(base.ImplementationList):
-    """Internal; list of implementations for a workflow."""
-    def _add_implem(cls, attrs, attrname, implem):
-        attrs[attrname] = TransitionImplementation.copy_from(implem)
+class Workflow(base.Workflow):
+    def db_log(self, transition, from_state, instance, user=None, *args, **kwargs):
+        TransitionLog.objects.create(modified_object=instance,
+                                     transition=transition.name,
+                                     user=user)
 
-
-class TransitionImplementation(base.TransitionImplementation):
-    """Internal; wraps the implementation of a transition for a workflow."""
-
-    extra_kwargs = {'log': True, 'save': True, 'user': None}
-
-    @classmethod
-    def copy_from(cls, implem):
-        return cls(implem.transition, implem.field_name, implem.implementation)
-
-    def _call_implem(self, instance, cls_kwargs, *args, **kwargs):
-        return super(TransitionImplementation, self)._call_implem(instance, cls_kwargs, *args, **kwargs)
-
-    def _post_transition(self, instance, res, cls_kwargs, *args, **kwargs):
-        save = cls_kwargs['save']
-        log = cls_kwargs['log']
-        user = cls_kwargs['user']
-        super(TransitionImplementation, self)._post_transition(instance, res, cls_kwargs, *args, **kwargs)
+    def log_transition(self, transition, from_state, instance,
+            save=True, log=True, *args, **kwargs):
+        super(Workflow, self).log_transition(
+            transition, from_state, instance, *args, **kwargs)
         if save:
             instance.save()
         if log:
-            TransitionLog.objects.create(modified_object=instance,
-                                         transition=self.transition.name,
-                                         user=user)
+            self.db_log(transition, from_state, instance, *args, **kwargs)
 
 
 class TransitionLog(models.Model):
