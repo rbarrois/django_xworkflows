@@ -71,6 +71,8 @@ class StateField(models.Field):
     description = _(u"State")
 
     def __init__(self, workflow, **kwargs):
+        if isinstance(workflow, type):
+            workflow = workflow()
         self.workflow = workflow
         kwargs['choices'] = list((st.name, st.title) for st in self.workflow.states)
         kwargs['max_length'] = max(len(st.name) for st in self.workflow.states)
@@ -172,12 +174,21 @@ class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
     """Metaclass for WorkflowEnabled objects."""
 
     @classmethod
-    def _add_workflow(mcs, workflow, state_field, attrs):
+    def _find_workflows(mcs, attrs):
+        """Find workflow definition(s) in a WorkflowEnabled definition."""
+        workflows = {}
+        for k, v in attrs.iteritems():
+            if isinstance(v, StateField):
+                workflows[k] = v
+        return workflows
+
+    @classmethod
+    def _add_workflow(mcs, field_name, state_field, attrs):
         """Attach the workflow to a set of attributes.
 
         This sets the django-specific StateField.
         """
-        attrs[state_field] = StateField(workflow)
+        attrs[field_name] = state_field
 
 
 class WorkflowEnabled(base.BaseWorkflowEnabled):
