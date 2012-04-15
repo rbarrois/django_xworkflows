@@ -3,7 +3,12 @@
 
 """Specific versions of XWorkflows to use with Django."""
 
+import datetime
+
 from django.db import models
+from django.conf import settings
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes import models as ct_models
 from django.core import exceptions
 from django.forms import fields
 from django.forms import widgets
@@ -186,9 +191,59 @@ class WorkflowEnabled(base.BaseWorkflowEnabled):
             return super(WorkflowEnabled, self)._get_FIELD_display(field)
 
 
+class BaseTransitionLog(models.Model):
+    """Abstract model for a minimal database logging setup.
+
+    Attributes:
+        modified_object (django.db.model.Model): the object affected by this
+            transition.
+        from_state (str): the name of the origin state
+        to_state (str): the name of the destination state
+        transition (str): The name of the transition being performed.
+        timestamp (datetime): The time at which the Transition was performed.
+    """
+
+    content_type = models.ForeignKey(ct_models.ContentType,
+                                     verbose_name=_(u"Content type"),
+                                     related_name="workflow_object",
+                                     blank=True, null=True)
+    content_id = models.PositiveIntegerField(_(u"Content id"), blank=True, null=True)
+    modified_object = generic.GenericForeignKey(
+            ct_field="content_type",
+            fk_field="content_id")
+
+    transition = models.CharField(_(u"transition"), max_length=255)
+    from_state = models.CharField(_(u"from state"), max_length=255)
+    to_state = models.CharField(_(u"to state"), max_length=255)
+    timestamp = models.DateTimeField(_(u"performed at"), default=datetime.datetime.now)
+
+    class Meta:
+        ordering = ('-timestamp', 'transition')
+        verbose_name = _(u'XWorkflow transition log')
+        verbose_name_plural = _(u'XWorkflow transition logs')
+        abstract = True
+
+    def __unicode__(self):
+        return u'%r: %s -> %s at %s' % (self.modified_object, self.from_state,
+            self.to_state, self.timestamp.isoformat())
+
+
+def get_default_log_model():
+    """The default log model depends on whether the xworkflow_log app is there."""
+    if 'django_xworkflows.xworkflow_log' in settings.INSTALLED_APPS:
+        return 'xworkflow_log.TransitionLog'
+    else:
+        return ''
+
+
 class Workflow(base.Workflow):
-    def __init__(self, log_model='xworkflow_log.TransitionLog', *args, **kwargs):
+    log_model = get_default_log_model()
+
+    def __init__(self, log_model=None, *args, **kwargs):
         super(Workflow, self).__init__(*args, **kwargs)
+
+        if log_model is None:
+            log_model = self.log_model
 
         if log_model:
             app_label, model_label = log_model.rsplit('.', 1)
