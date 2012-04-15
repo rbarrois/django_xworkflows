@@ -26,7 +26,7 @@ transition = base.transition
 class StateSelect(widgets.Select):
 
     def render(self, name, value, attrs=None, choices=()):
-        if isinstance(value, base.StateField):
+        if isinstance(value, base.StateWrapper):
             state_name = value.state.name
         elif isinstance(value, base.State):
             state_name = value.name
@@ -92,7 +92,7 @@ class StateField(models.Field):
 
     def to_python(self, value):
         """Converts the DB-stored value into a Python value."""
-        if isinstance(value, base.StateField):
+        if isinstance(value, base.StateWrapper):
             res = value
         else:
             if isinstance(value, base.State):
@@ -104,7 +104,7 @@ class StateField(models.Field):
                     state = self.workflow.states[value]
                 except KeyError:
                     raise exceptions.ValidationError(self.error_messages['invalid'])
-            res = base.StateField(state, self.workflow)
+            res = base.StateWrapper(state, self.workflow)
 
         if res.state not in self.workflow.states:
             raise exceptions.ValidationError(self.error_messages['invalid'])
@@ -139,10 +139,10 @@ class StateField(models.Field):
         """Validate that a given value is a valid option for a given model instance.
 
         Args:
-            value (xworkflows.base.StateField): The base.StateField returned by to_python.
+            value (xworkflows.base.StateWrapper): The base.StateWrapper returned by to_python.
             model_instance: A WorkflowEnabled instance
         """
-        if not isinstance(value, base.StateField):
+        if not isinstance(value, base.StateWrapper):
             raise exceptions.ValidationError(self.error_messages['wrong_type'] % value)
         elif not value.workflow == self.workflow:
             raise exceptions.ValidationError(self.error_messages['wrong_workflow'] % value.workflow)
