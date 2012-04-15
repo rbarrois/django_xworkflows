@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) 2011-2012 Raphaël Barrois
+
 import datetime
 
 from django.conf import settings

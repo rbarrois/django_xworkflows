@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) 2011-2012 Raphaël Barrois
+
 from django.db import models as djmodels
 
 from django_xworkflows import models

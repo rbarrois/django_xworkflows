@@ -1,32 +1,41 @@
 #!/usr/bin/env python
-# coding: utf-8
+# -*- coding: utf-8 -*-
+# Copyright (c) 2011-2012 Raphaël Barrois
+
 
 import os
+import re
 from setuptools import setup
 
-# Utility function to read the README file.
-# Used for the long_description.  It's nice, because now 1) we have a top level
-# README file and 2) it's easier to type in the README file than to put a raw
-# string in below ...
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+root_dir = os.path.abspath(os.path.dirname(__file__))
+
+
+def get_version():
+    version_re = re.compile(r"^__version__ = '([\w_.]+)'$")
+    with open(os.path.join(root_dir, 'src', 'django_xworkflows', '__init__.py')) as f:
+        for line in f:
+            match = version_re.match(line[:-1])
+            if match:
+                return match.groups()[0]
+    return '0.0'
+
 
 setup(
-        name = "django-xworkflows",
-        version = "0.1",
-        author = "Raphaël Barrois",
-        author_email = "raphael.barrois@polyconseil.fr",
-        description = ("A django app enabling Django models to use xworkflows."),
-        license = "BSD",
-        keywords = "django workflow state machine automaton",
-        url = "http://packages.python.org/django-xworkflows",
-        package_dir = {'': 'src'},
-        packages = ['django_xworkflows'],
-        long_description=read('README.rst'),
-        install_requires = ['xworkflows >=0.2.2', 'django >=1.3'],
-        tests_require = ['unittest2'],
-        classifiers=[
-            "Development Status :: 3 - Alpha",
+    name="django-xworkflows",
+    version=get_version(),
+    author="Raphaël Barrois",
+    author_email="raphael.barrois@polyconseil.fr",
+    description=("A django app enabling Django models to use xworkflows."),
+    license="BSD",
+    keywords="django workflow state machine automaton",
+    url="http://github.com/rbarrois/django-xworkflows",
+    download_url="http://pypi.python.org/pypi/django-xworkflows/",
+    package_dir={'': 'src'},
+    packages=['django_xworkflows'],
+    install_requires=['xworkflows >=0.2.2', 'django >=1.3'],
+    tests_require=['unittest2'],
+    classifiers=[
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
         "Topic :: Software Development :: Libraries :: Python Modules",

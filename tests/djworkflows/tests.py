@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) 2011-2012 Raphaël Barrois
+
 from django.core import exceptions
 from django.core import serializers
 from django.utils import unittest

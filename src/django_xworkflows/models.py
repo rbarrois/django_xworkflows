@@ -1,4 +1,6 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
+# Copyright (c) 2011-2012 Raphaël Barrois
+
 """Specific versions of XWorkflows to use with Django."""
 
 from django.db import models
