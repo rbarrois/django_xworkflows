@@ -1,9 +1,8 @@
 from django.db import models as djmodels
 
-import xworkflows
 from django_xworkflows import models
 
-class MyWorkflow(xworkflows.Workflow):
+class MyWorkflow(models.Workflow):
     states = ('foo', 'bar', 'baz')
     transitions = (
         ('foobar', 'foo', 'bar'),
@@ -13,7 +12,7 @@ class MyWorkflow(xworkflows.Workflow):
     initial_state = 'foo'
 
 
-class MyAltWorkflow(xworkflows.Workflow):
+class MyAltWorkflow(models.Workflow):
     states = (
         ('a', 'StateA'),
         ('b', 'StateB'),
@@ -35,5 +34,5 @@ class MyWorkflowEnabled(models.WorkflowEnabled, djmodels.Model):
 
 
 class WithTwoWorkflows(models.WorkflowEnabled, djmodels.Model):
-    state1 = MyWorkflow
-    state2 = MyAltWorkflow
+    state1 = MyWorkflow()
+    state2 = MyAltWorkflow()
