@@ -20,6 +20,7 @@ from xworkflows import base
 
 State = base.State
 AbortTransition = base.AbortTransition
+transition = base.transition
 
 
 class StateSelect(widgets.Select):
@@ -237,6 +238,9 @@ def get_default_log_model():
 
 
 class Workflow(base.Workflow):
+    """Extended workflow that handles object saving and logging to the database."""
+
+    #: Save log to this django model
     log_model = get_default_log_model()
 
     def __init__(self, log_model=None, *args, **kwargs):
@@ -251,6 +255,7 @@ class Workflow(base.Workflow):
         self.log_model = log_model
 
     def db_log(self, transition, from_state, instance, user=None, *args, **kwargs):
+        """Logs the transition into the database."""
         if self.log_model:
             self.log_model.objects.create(modified_object=instance,
                                          transition=transition.name,
@@ -258,6 +263,7 @@ class Workflow(base.Workflow):
 
     def log_transition(self, transition, from_state, instance,
             save=True, log=True, *args, **kwargs):
+        """Generic transition logging."""
         super(Workflow, self).log_transition(
             transition, from_state, instance, *args, **kwargs)
         if save:

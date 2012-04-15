@@ -1,5 +1,15 @@
 Library internals
 =================
 
+This page documents the internal behaviour of django_xworkflows.
 
-The django-xworkflows module defines a few specific classes.
+Core functionalities
+====================
+.. automodule:: django_xworkflows.models
+    :members:
+
+Logging to the database
+=======================
+.. automodule:: django_xworkflows.xworkflow_log.models
+    :members:
+

@@ -1,5 +1,0 @@
-Logging to the database
-=======================
-
-
-

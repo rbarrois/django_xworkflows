@@ -43,6 +43,31 @@ And add it to a model::
 
         state = MyWorkflow()
 
+The :attr:`state` field of :class:`MyModel` is now defined as a :class:`django.db.models.CharField`,
+whose :attr:`choices` and :attr:`default` are configured according to the related
+:class:`django_xworkflows.models.Workflow`.
+
+
+Integration with django
+=======================
+
+After each successful transition, a :func:`save()` is performed on the object.
+This behaviour is controlled by :
+
+* Passing the extra argument ``save=False`` when calling the transition method
+* Setting the extra argument ``save=False`` to the :func:`django_xworkflows.models.transition` decorator for the transition method.
+
+If the :class:`~django_xworkflows.models.Workflow` has a definition for the :attr:`log_model` attribute (as a ``<app>.<Model>`` string),
+an instance of that model will be created for each successful transition.
+
+If the :mod:`django_xworkflows.xworkflow_log` application is installed, :attr:`log_model` defaults to :class:`~django_xworkflows.xworkflow_log.models.TransitionLog`. Otherwise, it defaults to ``''`` (db logging disabled).
+
+This behaviour can be altered by:
+
+* Setting the :attr:`~django_xworkflows.models.Workflow.log_model` attribute to ``''``
+* Calling the transition method with ``log=False`` (no logging to database)
+* Overriding the :func:`~django_xworkflows.models.Workflow.db_log` method of the :class:`~django_xworkflows.models.Workflow`.
+
 
 Contents
 ========
@@ -50,8 +75,6 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   django
-   xworkflow_log
    internals
 
 Resources
