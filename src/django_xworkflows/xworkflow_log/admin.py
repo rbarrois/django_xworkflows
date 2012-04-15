@@ -8,7 +8,8 @@ from django.contrib import admin
 class TransitionLogAdmin(admin.ModelAdmin):
     actions = None
     date_hierarchy = 'timestamp'
-    list_display = ('modified_object', 'transition', 'user', 'timestamp',)
+    list_display = ('modified_object', 'transition', 'from_state', 'to_state', 'user', 'timestamp',)
+    list_filter = ('content_type', 'transition',)
     read_only_fields = ('user', 'modified_object', 'transition', 'timestamp',)
     search_fields = ('transition', 'user__username',)
 

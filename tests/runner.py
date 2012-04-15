@@ -16,6 +16,7 @@ if not settings.configured:
             'django.contrib.contenttypes',
             'tests.djworkflows',
             'django_xworkflows',
+            'django_xworkflows.xworkflow_log',
         ]
     )
 

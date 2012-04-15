@@ -4,6 +4,7 @@ from django.utils import unittest
 
 import xworkflows
 from django_xworkflows import models as xwf_models
+from django_xworkflows.xworkflow_log import models as xwlog_models
 
 from . import models
 
@@ -114,12 +115,12 @@ class TransitionTestCase(unittest.TestCase):
         self.assertEqual('abab', self.obj.gobaz('ab'))
 
     def test_logging(self):
-        xwf_models.TransitionLog.objects.all().delete()
+        xwlog_models.TransitionLog.objects.all().delete()
 
         self.obj.save()
         self.obj.foobar(save=False)
 
-        trlog = xwf_models.TransitionLog.objects.all()[0]
+        trlog = xwlog_models.TransitionLog.objects.all()[0]
         self.assertEqual(self.obj, trlog.modified_object)
         self.assertEqual('foobar', trlog.transition)
         self.assertEqual(None, trlog.user)

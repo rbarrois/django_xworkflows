@@ -2,9 +2,6 @@
 """Specific versions of XWorkflows to use with Django."""
 
 from django.db import models
-from django.conf import settings
-from django.contrib.contenttypes import generic
-from django.contrib.contenttypes import models as ct_models
 from django.core import exceptions
 from django.forms import fields
 from django.forms import widgets
@@ -188,10 +185,19 @@ class WorkflowEnabled(base.BaseWorkflowEnabled):
 
 
 class Workflow(base.Workflow):
+    def __init__(self, log_model='xworkflow_log.TransitionLog', *args, **kwargs):
+        super(Workflow, self).__init__(*args, **kwargs)
+
+        if log_model:
+            app_label, model_label = log_model.rsplit('.', 1)
+            log_model = models.get_model(app_label, model_label)
+        self.log_model = log_model
+
     def db_log(self, transition, from_state, instance, user=None, *args, **kwargs):
-        TransitionLog.objects.create(modified_object=instance,
-                                     transition=transition.name,
-                                     user=user)
+        if self.log_model:
+            self.log_model.objects.create(modified_object=instance,
+                                         transition=transition.name,
+                                         user=user)
 
     def log_transition(self, transition, from_state, instance,
             save=True, log=True, *args, **kwargs):
@@ -201,39 +207,3 @@ class Workflow(base.Workflow):
             instance.save()
         if log:
             self.db_log(transition, from_state, instance, *args, **kwargs)
-
-
-class TransitionLog(models.Model):
-    """The log for a transition.
-
-    Attributes:
-        modified_object (django.db.model.Model): the object affected by this
-            transition.
-        transition (str): The name of the transition being performed.
-        user (django.contrib.auth.user): the user performing the transition; the
-            actual model to use here is defined in the XWORKFLOWS_USER_MODEL
-            setting.
-        timestamp (datetime): The time at which the Transition was performed.
-    """
-
-    content_type = models.ForeignKey(ct_models.ContentType,
-                                     verbose_name=_(u"Content type"),
-                                     related_name="workflow_object",
-                                     blank=True, null=True)
-    content_id = models.PositiveIntegerField(_(u"Content id"), blank=True, null=True)
-    modified_object = generic.GenericForeignKey(
-            ct_field="content_type",
-            fk_field="content_id")
-
-    transition = models.CharField(_(u"transition"), max_length=255)
-    user = models.ForeignKey(
-        getattr(settings, 'XWORKFLOWS_USER_MODEL', 'auth.User'),
-        blank=True,
-        null=True,
-        verbose_name=_(u"author"))
-    timestamp = models.DateTimeField(_(u"performed at"), auto_now_add=True)
-
-    class Meta:
-        ordering = ('-timestamp', 'user', 'transition')
-        verbose_name = _(u'XWorkflow transition log')
-        verbose_name_plural = _(u'XWorkflow transition logs')

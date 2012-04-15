@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the django-xworkflows package.
 # Raphaël Barrois <raphael.barrois@xelmail.com> 2011.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-09-12 20:46+0200\n"
+"POT-Creation-Date: 2012-04-15 17:33+0200\n"
 "PO-Revision-Date: 2011-09-12 20:43+0200\n"
 "Last-Translator: Raphaël Barrois <raphael.barrois@xelmail.com>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -17,53 +16,53 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: models.py:62
+#: models.py:58
 msgid "Choose a valid state."
 msgstr "Choisissez un état valide."
 
-#: models.py:63
-#, fuzzy, python-format
+#: models.py:59
+#, python-format
 msgid "Please enter a valid value (got %r)."
 msgstr "Veuillez saisir une entrée valide (%r reçu)."
 
-#: models.py:64
+#: models.py:60
 #, python-format
 msgid "Please enter a value from the right workflow (got %r)."
 msgstr "Veuillez choisir un état du bon workflow (%r reçu)."
 
-#: models.py:65
+#: models.py:61
 #, python-format
 msgid "%s is not a valid state."
 msgstr "%s n'est pas un état valide"
 
-#: models.py:67
+#: models.py:63
 msgid "State"
 msgstr "État"
 
-#: models.py:206
+#: xworkflow_log/models.py:24
 msgid "Content type"
 msgstr "Type de contenu"
 
-#: models.py:209
+#: xworkflow_log/models.py:27
 msgid "Content id"
 msgstr "ID du contenu"
 
-#: models.py:214
+#: xworkflow_log/models.py:32
 msgid "transition"
 msgstr "transition"
 
-#: models.py:219
+#: xworkflow_log/models.py:35
 msgid "author"
 msgstr "auteur"
 
-#: models.py:220
+#: xworkflow_log/models.py:36
 msgid "performed at"
 msgstr "effectuée à"
 
-#: models.py:224
+#: xworkflow_log/models.py:40
 msgid "XWorkflow transition log"
 msgstr "log de transition (XWorkflow)"
 
-#: models.py:225
+#: xworkflow_log/models.py:41
 msgid "XWorkflow transition logs"
 msgstr "logs de transition (XWorkflow)"
