@@ -29,7 +29,7 @@ from django.test import simple
 def runtests(*test_args):
     if not test_args:
         test_args = ('djworkflows',)
-    runner = simple.DjangoTestSuiteRunner()
+    runner = simple.DjangoTestSuiteRunner(failfast=False)
     failures = runner.run_tests(test_args)
     sys.exit(failures)
 
