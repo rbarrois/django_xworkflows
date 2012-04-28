@@ -21,7 +21,7 @@ class ModelTestCase(unittest.TestCase):
         self.assertIn('state1', models.WithTwoWorkflows._workflows)
         self.assertIn('state2', models.WithTwoWorkflows._workflows)
 
-        self.assertEqual('foo',
+        self.assertEqual('Foo',
                 models.WithTwoWorkflows._workflows['state1'].states['foo'].title)
         self.assertEqual('StateA',
                 models.WithTwoWorkflows._workflows['state2'].states['a'].title)
@@ -86,8 +86,8 @@ class ModelTestCase(unittest.TestCase):
     def test_invalid_dump(self):
         data = '[{"pk": 1, "model": "djworkflows.myworkflowenabled", "fields": {"state": "blah"}}]'
 
-        self.assertRaises(exceptions.ValidationError,
-                          list, serializers.deserialize('json', data))
+        self.assertRaises(serializers.base.DeserializationError, list,
+            serializers.deserialize('json', data))
 
 
 class TransitionTestCase(unittest.TestCase):

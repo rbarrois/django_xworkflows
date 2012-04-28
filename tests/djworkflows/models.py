@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2011-2012 Raphaël Barrois
 
-from django.db import models as djmodels
+from django.db import models
 
-from django_xworkflows import models
+from django_xworkflows import models as dxmodels
 
-class MyWorkflow(models.Workflow):
-    states = ('foo', 'bar', 'baz')
+class MyWorkflow(dxmodels.Workflow):
+    states = (
+        ('foo', u"Foo"),
+        ('bar', u"Bar"),
+        ('baz', u"Baz"),
+    )
     transitions = (
         ('foobar', 'foo', 'bar'),
         ('gobaz', ('foo', 'bar'), 'baz'),
@@ -15,7 +19,7 @@ class MyWorkflow(models.Workflow):
     initial_state = 'foo'
 
 
-class MyAltWorkflow(models.Workflow):
+class MyAltWorkflow(dxmodels.Workflow):
     states = (
         ('a', 'StateA'),
         ('b', 'StateB'),
@@ -29,13 +33,14 @@ class MyAltWorkflow(models.Workflow):
     initial_state = 'a'
 
 
-class MyWorkflowEnabled(models.WorkflowEnabled, djmodels.Model):
-    state = models.StateField(MyWorkflow)
+class MyWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
+    state = dxmodels.StateField(MyWorkflow)
 
+    @dxmodels.transition()
     def gobaz(self, foo):
         return foo * 2
 
 
-class WithTwoWorkflows(models.WorkflowEnabled, djmodels.Model):
-    state1 = models.StateField(MyWorkflow())
-    state2 = models.StateField(MyAltWorkflow())
+class WithTwoWorkflows(dxmodels.WorkflowEnabled, models.Model):
+    state1 = dxmodels.StateField(MyWorkflow())
+    state2 = dxmodels.StateField(MyAltWorkflow())
