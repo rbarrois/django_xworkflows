@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.viewcode', 'fix_django_settings']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.viewcode', 'sphinx.ext.intersphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -86,6 +86,11 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+intersphinx_mapping = {
+    'xworkflows': ('http://readthedocs.org/docs/xworkflows/', None),
+    'django': ('http://docs.djangoproject.com/en/dev/',
+               'http://docs.djangoproject.com/en/dev/_objects/'),
+}
 
 # -- Options for HTML output ---------------------------------------------------
 

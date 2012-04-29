@@ -25,8 +25,13 @@ transition = base.transition
 
 
 class StateSelect(widgets.Select):
+    """Custom 'select' widget to handle state retrieval."""
 
     def render(self, name, value, attrs=None, choices=()):
+        """Handle a few expected values for rendering the current choice.
+
+        Extracts the state name from StateWrapper and State object.
+        """
         if isinstance(value, base.StateWrapper):
             state_name = value.state.name
         elif isinstance(value, base.State):
