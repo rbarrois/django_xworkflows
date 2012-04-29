@@ -143,7 +143,16 @@ class TransitionTestCase(unittest.TestCase):
 
         obj = models.MyWorkflowEnabled.objects.get(pk=self.obj.id)
 
-        self.assertTrue(obj.state.is_bar)
+        self.assertEqual(models.MyWorkflow.states.bar, obj.state)
+
+    def test_transactions(self):
+        self.obj.save()
+
+        self.assertRaises(ValueError, self.obj.gobaz, 21)
+
+        obj = models.MyWorkflowEnabled.objects.get(pk=self.obj.id)
+
+        self.assertEqual(models.MyWorkflow.states.foo, obj.state)
 
 
 @unittest.skipIf(south is None, "Couldn't import south.")

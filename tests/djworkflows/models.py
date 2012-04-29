@@ -36,7 +36,11 @@ class MyAltWorkflow(dxmodels.Workflow):
 class MyWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
     state = dxmodels.StateField(MyWorkflow)
 
-    @dxmodels.transition()
+    def fail_if_fortytwo(self, res, *args, **kwargs):
+        if res == 42:
+            raise ValueError()
+
+    @dxmodels.transition(after=fail_if_fortytwo)
     def gobaz(self, foo):
         return foo * 2
 

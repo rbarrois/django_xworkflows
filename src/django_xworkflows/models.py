@@ -6,6 +6,7 @@
 import datetime
 
 from django.db import models
+from django.db import transaction
 from django.conf import settings
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes import models as ct_models
@@ -260,11 +261,22 @@ def get_default_log_model():
         return ''
 
 
+class TransactionalImplementationWrapper(base.ImplementationWrapper):
+    """Customize the base ImplementationWrapper to run into a db transaction."""
+
+    def __call__(self, *args, **kwargs):
+        with transaction.commit_on_success():
+            return super(TransactionalImplementationWrapper, self).__call__(*args, **kwargs)
+
+
 class Workflow(base.Workflow):
     """Extended workflow that handles object saving and logging to the database."""
 
     #: Save log to this django model
     log_model = get_default_log_model()
+
+    #: Run all transitions withi a transaction.
+    implementation_class = TransactionalImplementationWrapper
 
     def __init__(self, log_model=None, *args, **kwargs):
         super(Workflow, self).__init__(*args, **kwargs)
