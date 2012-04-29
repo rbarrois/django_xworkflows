@@ -1,7 +1,7 @@
-Welcome to django-xworkflows's documentation!
-=============================================
+django-xworkflows documentation
+===============================
 
-django-xworkflows is a django application adding xworkflows functionnalities to
+django-xworkflows is a django application adding `xworkflows <http://github.com/rbarrois/xworkflows/>`_ functionnalities to
 django models.
 
 
@@ -54,10 +54,13 @@ Integration with django
 After each successful transition, a :func:`save()` is performed on the object.
 This behaviour is controlled by passing the extra argument ``save=False`` when calling the transition method.
 
-If the :class:`~django_xworkflows.models.Workflow` has a definition for the :attr:`log_model` attribute (as a ``<app>.<Model>`` string),
+If the :class:`~django_xworkflows.models.Workflow` has a definition for the :attr:`~django_xworkflows.models.Workflow.log_model` attribute (as a ``<app>.<Model>`` string),
 an instance of that model will be created for each successful transition.
 
-If the :mod:`django_xworkflows.xworkflow_log` application is installed, :attr:`log_model` defaults to :class:`~django_xworkflows.xworkflow_log.models.TransitionLog`. Otherwise, it defaults to ``''`` (db logging disabled).
+If the :mod:`django_xworkflows.xworkflow_log` application is installed,
+:attr:`~django_xworkflows.models.Workflow.log_model` defaults to
+:class:`~django_xworkflows.xworkflow_log.models.TransitionLog`.
+Otherwise, it defaults to ``''`` (db logging disabled).
 
 This behaviour can be altered by:
 

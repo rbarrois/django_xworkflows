@@ -2,7 +2,7 @@
 Library internals
 =================
 
-.. module:: django_xworkflows
+.. module:: django_xworkflows.models
     :synopsis: XWorkflows bindings for Django
 
 This page documents the internal mechanisms of django_xworkflows.
@@ -132,6 +132,7 @@ or by using the django-specific :class:`Workflow`.
         This holds the model to use to log to the database.
         If empty, no database logging is performed.
 
+
     .. method:: db_log(self, transition, from_state, instance, user=None, *args, **kwargs)
 
         .. fix VIM coloring **
@@ -145,13 +146,35 @@ or by using the django-specific :class:`Workflow`.
         - :class:`~django.db.models.ForeignKey` to the user responsible for the transition
         - timestamp of the operation
 
-        The default :class:`TransitionLog` model is :class:`xworkflow_log.models.TransitionLog`,
+        The default :class:`TransitionLog` model is :class:`django_xworkflows.xworkflow_log.models.TransitionLog`,
         but an alternative one can be specified in :attr:`log_model`.
 
         .. hint:: Override this method to log to a custom TransitionLog without generic foreign keys.
 
 
-.. class:: xworkflow_log.models.TransitionLog(BaseTransitionLog)
+    .. method:: log_transition(self, transition, from_state, instance, save=True, log=True, *args, **kwargs)
+
+        .. fix VIM coloring **
+
+        In addition to :func:`xworkflows.Workflow.log_transition`, additional actions are performed:
+
+        - If :attr:`save` is ``True``, the instance is saved.
+        - If :attr:`log` is ``True``, the :func:`db_log` method is called to register the
+          transition in the database.
+
+
+Transition logs
+===============
+
+.. module:: django_xworkflows.xworkflow_log.models
+    :synopsis: Keep an example :class:`~django_xworkflows.models.BaseTransitionLog` model,
+      with admin and translations.
+
+An example :class:`TransitionLog` model is available in the ``django_xworkflows.xworkflow_log`` application.
+Including it to :attr:`~django.conf.settings.INSTALLED_APPS` will enable database
+logging of transitions for all :class:`~django_xworkflows.models.WorkflowEnabled` subclasses.
+
+.. class:: TransitionLog(BaseTransitionLog)
 
     This specific :class:`TransitionLog` also stores the user responsible for the
     transition, if provided.
