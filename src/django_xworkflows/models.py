@@ -154,7 +154,6 @@ class StateField(models.Field):
     def formfield(self, form_class=fields.ChoiceField, widget=StateSelect, **kwargs):
         return super(StateField, self).formfield(form_class, widget=widget, **kwargs)
 
-
     try:
         import south
     except ImportError:
@@ -162,12 +161,23 @@ class StateField(models.Field):
     else:
         def south_field_triple(self):
             """Return a suitable description of this field for South."""
-            workflow_class = type(self.workflow)
-            workflow = ("__import__('%(mod)s', globals(), locals(), '%(cls)s').%(cls)s"
-                    % {'mod': workflow_class.__module__, 'cls': workflow_class.__name__})
             from south.modelsinspector import introspector
             args, kwargs = introspector(self)
-            return ('django_xworkflows.models.StateField', [workflow] + args, kwargs)
+
+            state_def = tuple((st.name, st.title) for st in self.workflow.states)
+            initial_state_def = self.workflow.initial_state.name
+
+            workflow = (
+                "__import__('xworkflows', globals(), locals()).base.WorkflowMeta("
+                "'%(class_name)s', (), "
+                "{'states': %(states)r, 'initial_state': %(initial_state)r})" % {
+                    'class_name': self.workflow.__class__.__name__,
+                    'states': state_def,
+                    'initial_state': initial_state_def,
+                })
+            kwargs['workflow'] = workflow
+
+            return ('django_xworkflows.models.StateField', args, kwargs)
 
 
 class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
