@@ -8,7 +8,7 @@ Library internals
 This page documents the internal mechanisms of django_xworkflows.
 
 Binding to a workflow
----------------------
+=====================
 
 The mechanism to bind a django model to a :class:`xworkflows.Workflow` relies on the :class:`WorkflowEnabled` and :class:`StateField` classes.
 
