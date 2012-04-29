@@ -200,6 +200,9 @@ class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
         """
         attrs[field_name] = state_field
 
+        implems = base.ImplementationList(field_name, state_field.workflow)
+        implems.transform(attrs)
+
 
 class WorkflowEnabled(base.BaseWorkflowEnabled):
     """Base class for all django models wishing to use a Workflow."""

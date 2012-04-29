@@ -15,16 +15,16 @@ from . import models
 class ModelTestCase(unittest.TestCase):
     def test_workflow(self):
         self.assertEqual(models.MyWorkflow.states,
-                         models.MyWorkflowEnabled._workflows['state'].states)
+                         models.MyWorkflowEnabled._workflows['state'].workflow.states)
 
     def test_dual_workflows(self):
         self.assertIn('state1', models.WithTwoWorkflows._workflows)
         self.assertIn('state2', models.WithTwoWorkflows._workflows)
 
         self.assertEqual('Foo',
-                models.WithTwoWorkflows._workflows['state1'].states['foo'].title)
+                models.WithTwoWorkflows._workflows['state1'].workflow.states['foo'].title)
         self.assertEqual('StateA',
-                models.WithTwoWorkflows._workflows['state2'].states['a'].title)
+                models.WithTwoWorkflows._workflows['state2'].workflow.states['a'].title)
 
     def test_instantiation(self):
         o = models.MyWorkflowEnabled()
