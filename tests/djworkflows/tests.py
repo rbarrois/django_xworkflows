@@ -6,8 +6,16 @@ from django.core import serializers
 from django.utils import unittest
 
 import xworkflows
+
 from django_xworkflows import models as xwf_models
 from django_xworkflows.xworkflow_log import models as xwlog_models
+
+try:
+    import south
+    import south.creator.freezer
+    import south.modelsinspector
+except ImportError:
+    south = None
 
 from . import models
 
@@ -136,3 +144,51 @@ class TransitionTestCase(unittest.TestCase):
         obj = models.MyWorkflowEnabled.objects.get(pk=self.obj.id)
 
         self.assertTrue(obj.state.is_bar)
+
+
+@unittest.skipIf(south is None, "Couldn't import south.")
+class SouthTestCase(unittest.TestCase):
+    """Tests south-related behavior."""
+
+    frozen_workflow = "__import__('xworkflows', globals(), locals()).base.WorkflowMeta('MyWorkflow', (), {'states': (('foo', u'Foo'), ('bar', u'Bar'), ('baz', u'Baz')), 'initial_state': 'foo'})"
+
+    def test_south_triple(self):
+        field = models.MyWorkflowEnabled._meta.get_field_by_name('state')[0]
+        triple = field.south_field_triple()
+
+        self.assertEqual(
+            (
+                'django_xworkflows.models.StateField',  # Class
+                [],  # *args
+                {
+                    'default': "'foo'",
+                    'max_length': '3',
+                    'workflow': self.frozen_workflow},  # **kwargs
+            ), triple)
+
+    def test_freezing_model(self):
+        frozen = south.modelsinspector.get_model_fields(models.MyWorkflowEnabled)
+
+        self.assertEqual(self.frozen_workflow, frozen['state'][2]['workflow'])
+
+    def test_freezing_app(self):
+        frozen = south.creator.freezer.freeze_apps('djworkflows')
+        self.assertEqual(self.frozen_workflow, frozen['djworkflows.myworkflowenabled']['state'][2]['workflow'])
+
+    def test_frozen_orm(self):
+        frozen = south.creator.freezer.freeze_apps('djworkflows')
+
+        class FakeMigration(object):
+            models = frozen
+
+        frozen_orm = south.orm.FakeORM(FakeMigration, 'djworkflows')
+
+        frozen_model = frozen_orm.MyWorkflowEnabled
+        frozen_field = frozen_model._meta.get_field_by_name('state')[0]
+
+        for state in models.MyWorkflow.states:
+            frozen_state = frozen_field.workflow.states[state.name]
+            self.assertEqual(state.name, frozen_state.name)
+
+        self.assertEqual(models.MyWorkflow.initial_state.name,
+            frozen_field.workflow.initial_state.name)
