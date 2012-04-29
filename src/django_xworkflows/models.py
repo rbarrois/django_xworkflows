@@ -180,7 +180,11 @@ class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
 
     @classmethod
     def _find_workflows(mcs, attrs):
-        """Find workflow definition(s) in a WorkflowEnabled definition."""
+        """Find workflow definition(s) in a WorkflowEnabled definition.
+
+        This method overrides the default behavior from xworkflows in order to
+        use our custom StateField objects.
+        """
         workflows = {}
         for k, v in attrs.iteritems():
             if isinstance(v, StateField):

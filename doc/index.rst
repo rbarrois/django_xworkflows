@@ -41,7 +41,7 @@ And add it to a model::
 
     class MyModel(xwf_models.WorkflowEnabled):
 
-        state = MyWorkflow()
+        state = xwf_models.StateField(MyWorkflow)
 
 The :attr:`state` field of :class:`MyModel` is now defined as a :class:`django.db.models.CharField`,
 whose :attr:`choices` and :attr:`default` are configured according to the related
@@ -52,10 +52,7 @@ Integration with django
 =======================
 
 After each successful transition, a :func:`save()` is performed on the object.
-This behaviour is controlled by :
-
-* Passing the extra argument ``save=False`` when calling the transition method
-* Setting the extra argument ``save=False`` to the :func:`django_xworkflows.models.transition` decorator for the transition method.
+This behaviour is controlled by passing the extra argument ``save=False`` when calling the transition method.
 
 If the :class:`~django_xworkflows.models.Workflow` has a definition for the :attr:`log_model` attribute (as a ``<app>.<Model>`` string),
 an instance of that model will be created for each successful transition.
@@ -67,6 +64,8 @@ This behaviour can be altered by:
 * Setting the :attr:`~django_xworkflows.models.Workflow.log_model` attribute to ``''``
 * Calling the transition method with ``log=False`` (no logging to database)
 * Overriding the :func:`~django_xworkflows.models.Workflow.db_log` method of the :class:`~django_xworkflows.models.Workflow`.
+* Overriding the :func:`~django_xworkflows.models.Workflow.log_transition`
+  method of the :class:`~django_xworkflows.models.Workflow`; this controls both ``log`` and ``save`` behaviours.
 
 
 Contents
@@ -84,6 +83,7 @@ Resources
 * Repository and issues on GitHub: http://github.com/rbarrois/django-xworkflows
 * Doc on http://readthedocs.org/docs/django-xworkflows/
 * XWorkflows on GitHub: http://github.com/rbarrois/xworkflows
+* XWorkflows doc on http://readthedocs.org/docs/xworkflows/
 
 Indices and tables
 ==================
