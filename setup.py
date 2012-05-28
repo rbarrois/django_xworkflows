@@ -31,7 +31,7 @@ setup(
     url="http://github.com/rbarrois/django_xworkflows",
     download_url="http://pypi.python.org/pypi/django-xworkflows/",
     package_dir={'': 'src'},
-    packages=['django_xworkflows'],
+    packages=['django_xworkflows', 'django_xworkflows.xworkflow_log'],
     install_requires=['xworkflows >=0.3.0', 'django >=1.3'],
     tests_require=['unittest2'],
     classifiers=[
