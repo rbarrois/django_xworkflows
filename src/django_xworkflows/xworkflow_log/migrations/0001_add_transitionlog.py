@@ -2,20 +2,26 @@
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
+from django.db import connection
 from django.db import models
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'TransitionLog'
-        db.create_table('xworkflow_log_transitionlog', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='workflow_object', null=True, to=orm['contenttypes.ContentType'])),
-            ('content_id', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True)),
-            ('transition', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
-            ('timestamp', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
-        ))
+
+        if 'django_xworkflows_transitionlog' in connection.introspection.table_names():
+            db.rename_table('django_xworkflows_transitionlog', 'xworkflow_log_transitionlog')
+        else:
+            # Adding model 'TransitionLog'
+            db.create_table('xworkflow_log_transitionlog', (
+                ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+                ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='workflow_object', null=True, to=orm['contenttypes.ContentType'])),
+                ('content_id', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True)),
+                ('transition', self.gf('django.db.models.fields.CharField')(max_length=255)),
+                ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
+                ('timestamp', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
+            ))
+
         db.send_create_signal('xworkflow_log', ['TransitionLog'])
 
 
