@@ -28,7 +28,7 @@ setup(
     description=("A django app enabling Django models to use xworkflows."),
     license="BSD",
     keywords="django workflow state machine automaton",
-    url="http://github.com/rbarrois/django-xworkflows",
+    url="http://github.com/rbarrois/django_xworkflows",
     download_url="http://pypi.python.org/pypi/django-xworkflows/",
     package_dir={'': 'src'},
     packages=['django_xworkflows'],
