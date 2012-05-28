@@ -281,7 +281,7 @@ class TransactionalImplementationWrapper(base.ImplementationWrapper):
 class Workflow(base.Workflow):
     """Extended workflow that handles object saving and logging to the database."""
 
-    #: Save log to this django model
+    #: Save log to this django model (name of the model)
     log_model = get_default_log_model()
 
     #: Run all transitions withi a transaction.
@@ -293,17 +293,30 @@ class Workflow(base.Workflow):
         if log_model is None:
             log_model = self.log_model
 
-        if log_model:
-            app_label, model_label = log_model.rsplit('.', 1)
-            log_model = models.get_model(app_label, model_label)
         self.log_model = log_model
+        self.log_model_class = None
+
+    def _get_log_model_class(self):
+        """Cache for fetching the actual log model object once django is loaded.
+
+        Otherwise, import conflict occur: WorkflowEnabled import <log_model>
+        which tries to import all models to retrieve the proper model class.
+        """
+        if self.log_model_class is not None:
+            return self.log_model_class
+
+        if self.log_model:
+            app_label, model_label = self.log_model.rsplit('.', 1)
+            self.log_model_class = models.get_model(app_label, model_label)
+            return self.log_model_class
 
     def db_log(self, transition, from_state, instance, user=None, *args, **kwargs):
         """Logs the transition into the database."""
         if self.log_model:
-            self.log_model.objects.create(modified_object=instance,
-                                         transition=transition.name,
-                                         user=user)
+            model_class = self._get_log_model_class()
+            model_class.objects.create(modified_object=instance,
+                                       transition=transition.name,
+                                       user=user)
 
     def log_transition(self, transition, from_state, instance,
             save=True, log=True, *args, **kwargs):
