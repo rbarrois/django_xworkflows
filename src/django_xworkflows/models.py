@@ -21,6 +21,10 @@ from xworkflows import base
 
 State = base.State
 AbortTransition = base.AbortTransition
+ForbiddenTransition = base.ForbiddenTransition
+InvalidTransitionError = base.InvalidTransitionError
+WorkflowError = base.WorkflowError
+
 transition = base.transition
 
 
