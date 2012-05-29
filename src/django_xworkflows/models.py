@@ -169,7 +169,8 @@ class StateField(models.Field):
         from south.modelsinspector import introspector
         args, kwargs = introspector(self)
 
-        state_def = tuple((st.name, st.title) for st in self.workflow.states)
+        state_def = tuple(
+            (str(st.name), unicode(st.title)) for st in self.workflow.states)
         initial_state_def = self.workflow.initial_state.name
 
         workflow = (
