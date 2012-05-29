@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+0.4.2 (current)
+---------------
+
+*Bugfix:*
+
+    * Fix log=False/save=False when calling transitions
+
 0.4.1 (29/05/2012)
 ------------------
 
