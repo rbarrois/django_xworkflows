@@ -38,6 +38,10 @@ class ModelTestCase(unittest.TestCase):
         o = models.MyWorkflowEnabled()
         self.assertEqual(models.MyWorkflow.states['foo'], o.state)
 
+    def test_instantiation_from_empty(self):
+        o = models.MyWorkflowEnabled(state=None)
+        self.assertEqual(models.MyWorkflow.states['foo'], o.state)
+
     def test_class_attribute(self):
         self.assertEqual(models.MyWorkflow, models.MyWorkflowEnabled.state.__class__)
 
