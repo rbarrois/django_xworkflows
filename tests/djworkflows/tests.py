@@ -59,6 +59,11 @@ class ModelTestCase(unittest.TestCase):
         self.assertRaises(exceptions.ValidationError, set_invalid_state)
         self.assertEqual(models.MyWorkflow.states['foo'], o.state)
 
+    def test_display(self):
+        o = models.MyWorkflowEnabled(other='aaa')
+        self.assertEqual(u"Foo", o.get_state_display())
+        self.assertEqual(u"AAA", o.get_other_display())
+
     def test_queries(self):
         models.MyWorkflowEnabled.objects.all().delete()
 

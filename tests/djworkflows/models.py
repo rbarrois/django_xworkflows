@@ -36,7 +36,13 @@ class MyAltWorkflow(dxmodels.Workflow):
 
 
 class MyWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
+    OTHER_CHOICES = (
+        ('aaa', u"AAA"),
+        ('bbb', u"BBB"),
+    )
+
     state = dxmodels.StateField(MyWorkflow)
+    other = models.CharField(max_length=4, choices=OTHER_CHOICES)
 
     def fail_if_fortytwo(self, res, *args, **kwargs):
         if res == 42:
