@@ -279,7 +279,14 @@ class TransactionalImplementationWrapper(base.ImplementationWrapper):
 
 
 class Workflow(base.Workflow):
-    """Extended workflow that handles object saving and logging to the database."""
+    """Extended workflow that handles object saving and logging to the database.
+
+    Attributes:
+        log_model (str): the name of the log model to use; if empty, logging to
+            database will be disabled.
+        log_model_class (obj): the class for the log model; resolved once django
+            is completely loaded.
+    """
 
     #: Save log to this django model (name of the model)
     log_model = get_default_log_model()
@@ -287,11 +294,11 @@ class Workflow(base.Workflow):
     #: Run all transitions withi a transaction.
     implementation_class = TransactionalImplementationWrapper
 
-    def __init__(self, log_model=None, *args, **kwargs):
-        super(Workflow, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        # Fetch 'log_model' if overridden.
+        log_model = kwargs.pop('log_model', self.log_model)
 
-        if log_model is None:
-            log_model = self.log_model
+        super(Workflow, self).__init__(*args, **kwargs)
 
         self.log_model = log_model
         self.log_model_class = None
@@ -305,10 +312,9 @@ class Workflow(base.Workflow):
         if self.log_model_class is not None:
             return self.log_model_class
 
-        if self.log_model:
-            app_label, model_label = self.log_model.rsplit('.', 1)
-            self.log_model_class = models.get_model(app_label, model_label)
-            return self.log_model_class
+        app_label, model_label = self.log_model.rsplit('.', 1)
+        self.log_model_class = models.get_model(app_label, model_label)
+        return self.log_model_class
 
     def db_log(self, transition, from_state, instance, user=None, *args, **kwargs):
         """Logs the transition into the database."""

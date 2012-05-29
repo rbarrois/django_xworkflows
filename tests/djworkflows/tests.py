@@ -136,6 +136,21 @@ class TransitionTestCase(unittest.TestCase):
         self.assertEqual('foobar', trlog.transition)
         self.assertEqual(None, trlog.user)
 
+    def test_no_logging(self):
+        """Tests disabled transition logs."""
+        xwlog_models.TransitionLog.objects.all().delete()
+
+        obj = models.WithTwoWorkflows()
+        obj.save()
+
+        # No log model on MyAltWorkflow
+        obj.tob()
+        self.assertFalse(xwlog_models.TransitionLog.objects.exists())
+
+        # Log model provided for MyWorkflow
+        obj.foobar()
+        self.assertTrue(xwlog_models.TransitionLog.objects.exists())
+
     def test_saving(self):
         self.obj.save()
 

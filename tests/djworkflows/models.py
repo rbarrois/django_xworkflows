@@ -32,6 +32,8 @@ class MyAltWorkflow(dxmodels.Workflow):
     )
     initial_state = 'a'
 
+    log_model = ''
+
 
 class MyWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
     state = dxmodels.StateField(MyWorkflow)
