@@ -291,7 +291,7 @@ class Workflow(base.Workflow):
     #: Save log to this django model (name of the model)
     log_model = get_default_log_model()
 
-    #: Run all transitions withi a transaction.
+    #: Run all transitions within a transaction.
     implementation_class = TransactionalImplementationWrapper
 
     def __init__(self, *args, **kwargs):
