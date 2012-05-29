@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+0.4.4 (29/05/2012)
+------------------
+
+*Bugfix:*
+
+    * Serialize unicode of :attr:`xworkflows.State.title` in south ORM freezing.
+
 0.4.3 (29/05/2012)
 ------------------
 
