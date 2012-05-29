@@ -49,7 +49,7 @@ class MyWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
             raise ValueError()
 
     @dxmodels.transition(after=fail_if_fortytwo)
-    def gobaz(self, foo):
+    def gobaz(self, foo, save=True):
         return foo * 2
 
 

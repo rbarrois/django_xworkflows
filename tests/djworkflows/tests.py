@@ -173,6 +173,13 @@ class TransitionTestCase(unittest.TestCase):
 
         self.assertEqual(models.MyWorkflow.states.bar, obj.state)
 
+    def test_no_saving(self):
+        self.obj.save()
+        self.assertEqual(84, self.obj.gobaz(42, save=False))
+
+        obj = models.MyWorkflowEnabled.objects.get(pk=self.obj.id)
+        self.assertEqual(models.MyWorkflow.states.foo, obj.state)
+
     def test_transactions(self):
         self.obj.save()
 

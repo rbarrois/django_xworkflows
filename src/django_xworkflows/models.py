@@ -316,8 +316,9 @@ class Workflow(base.Workflow):
         self.log_model_class = models.get_model(app_label, model_label)
         return self.log_model_class
 
-    def db_log(self, transition, from_state, instance, user=None, *args, **kwargs):
+    def db_log(self, transition, from_state, instance, *args, **kwargs):
         """Logs the transition into the database."""
+        user = kwargs.pop('user', None)
         if self.log_model:
             model_class = self._get_log_model_class()
             model_class.objects.create(modified_object=instance,
@@ -326,9 +327,10 @@ class Workflow(base.Workflow):
                                        to_state=transition.target.name,
                                        user=user)
 
-    def log_transition(self, transition, from_state, instance,
-            save=True, log=True, *args, **kwargs):
+    def log_transition(self, transition, from_state, instance, *args, **kwargs):
         """Generic transition logging."""
+        save = kwargs.pop('save', True)
+        log = kwargs.pop('log', True)
         super(Workflow, self).log_transition(
             transition, from_state, instance, *args, **kwargs)
         if save:
