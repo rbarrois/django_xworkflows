@@ -322,6 +322,8 @@ class Workflow(base.Workflow):
             model_class = self._get_log_model_class()
             model_class.objects.create(modified_object=instance,
                                        transition=transition.name,
+                                       from_state=from_state.name,
+                                       to_state=transition.target.name,
                                        user=user)
 
     def log_transition(self, transition, from_state, instance,

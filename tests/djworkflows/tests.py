@@ -135,6 +135,10 @@ class TransitionTestCase(unittest.TestCase):
         self.assertEqual(self.obj, trlog.modified_object)
         self.assertEqual('foobar', trlog.transition)
         self.assertEqual(None, trlog.user)
+        self.assertEqual('foo', trlog.from_state)
+        self.assertEqual('bar', trlog.to_state)
+
+        self.assertIn('foo -> bar', unicode(trlog))
 
     def test_no_logging(self):
         """Tests disabled transition logs."""
