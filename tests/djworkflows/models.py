@@ -18,6 +18,8 @@ class MyWorkflow(dxmodels.Workflow):
     )
     initial_state = 'foo'
 
+    implementation_class = dxmodels.TransactionalImplementationWrapper
+
 
 class MyAltWorkflow(dxmodels.Workflow):
     states = (
