@@ -1,6 +1,14 @@
 ChangeLog
 =========
 
+0.4.5 (12/06/2012)
+------------------
+
+*Bugfix:*
+
+    * Don't default to :class:`~django_xworkflows.models.TransactionalImplementationWrapper` when using
+      a :class:`django_xworkflows.models.Workflow`.
+
 0.4.4 (29/05/2012)
 ------------------
 
