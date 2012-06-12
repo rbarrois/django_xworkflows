@@ -113,16 +113,18 @@ Transitions mostly follow XWorkflows' mechanism.
     :attr:`~xworkflows.base.ImplementationWrapper.after`) in a single database transaction.
 
 
-The :class:`TransactionalImplementationWrapper` can be enabled either by setting it to
-the :attr:`~xworkflows.base.Workflow.implementation_class` attribute of a simple :class:`xworkflows.Workflow`,
-or by using the django-specific :class:`Workflow`.
+The :class:`TransactionalImplementationWrapper` can be enabled by setting it to
+the :attr:`~xworkflows.base.Workflow.implementation_class` attribute of a :class:`xworkflows.Workflow` or
+of a :class:`Workflow`::
+
+    class MyWorkflow(models.Workflow):
+        implementation_class = models.TransactionalImplementationWrapper
 
 
 .. class:: Workflow(xworkflows.Workflow)
 
     This :class:`xworkflows.Workflow` subclass performs a few customization:
 
-    - Using :class:`TransactionalImplementationWrapper` to run transitions in a transaction
     - Logging transition logs in database
     - Saving updated objects after the transition
 
