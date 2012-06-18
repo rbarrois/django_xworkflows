@@ -1,6 +1,12 @@
 ChangeLog
 =========
 
+0.5.0 (current)
+---------------
+
+    * Add rebuild_transitionlog_states management command to refill :attr:`~django_xworkflows.models.TransitionLog.from_state`
+      and :attr:`~django_xworkflows.models.TransitionLog.to_state`.
+
 0.4.5 (12/06/2012)
 ------------------
 
