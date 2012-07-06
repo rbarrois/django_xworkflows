@@ -103,7 +103,7 @@ class ModelTestCase(unittest.TestCase):
     def test_invalid_dump(self):
         data = '[{"pk": 1, "model": "djworkflows.myworkflowenabled", "fields": {"state": "blah"}}]'
 
-        self.assertRaises(exceptions.ValidationError, list,
+        self.assertRaises(serializers.json.DeserializationError, list,
             serializers.deserialize('json', data))
 
 
