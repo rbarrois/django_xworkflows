@@ -206,10 +206,16 @@ class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
     def _add_workflow(mcs, field_name, state_field, attrs):
         """Attach the workflow to a set of attributes.
 
-        This sets the django-specific StateField.
-        """
-        attrs[field_name] = state_field
+        Constructs the ImplementationWrapper for transitions, and adds them to
+        the attributes dict.
 
+        Args:
+            field_name (str): name of the attribute where the StateField lives
+            state_field (StateField): StateField describing that attribute
+            attrs (dict): dictionary of attributes for the class being created
+        """
+        # No need to override the 'field_name' from attrs: it already contains
+        # a valid value, and that would clash with django model inheritance.
         implems = base.ImplementationList(field_name, state_field.workflow)
         implems.transform(attrs)
 
