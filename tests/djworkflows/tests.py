@@ -3,6 +3,7 @@
 
 from django.core import exceptions
 from django.core import serializers
+from django.db import models as django_models
 from django.utils import unittest
 
 import xworkflows
@@ -105,6 +106,31 @@ class ModelTestCase(unittest.TestCase):
 
         self.assertRaises(serializers.json.DeserializationError, list,
             serializers.deserialize('json', data))
+
+
+class InheritanceTestCase(unittest.TestCase):
+    """Tests inheritance-related behaviour."""
+    def test_simple(self):
+        class BaseWorkflowEnabled(xwf_models.WorkflowEnabled, django_models.Model):
+            state = xwf_models.StateField(models.MyWorkflow)
+
+        class SubWorkflowEnabled(BaseWorkflowEnabled):
+            pass
+
+        obj = SubWorkflowEnabled()
+        self.assertEqual(models.MyWorkflow.initial_state, obj.state)
+
+    def test_abstract(self):
+        class AbstractWorkflowEnabled(xwf_models.WorkflowEnabled, django_models.Model):
+            state = xwf_models.StateField(models.MyWorkflow)
+            class Meta:
+                abstract = True
+
+        class ConcreteWorkflowEnabled(AbstractWorkflowEnabled):
+            pass
+
+        obj = ConcreteWorkflowEnabled()
+        self.assertEqual(models.MyWorkflow.initial_state, obj.state)
 
 
 class TransitionTestCase(unittest.TestCase):
