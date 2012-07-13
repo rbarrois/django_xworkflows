@@ -4,8 +4,15 @@ ChangeLog
 0.5.0 (current)
 ---------------
 
-    * Add rebuild_transitionlog_states management command to refill :attr:`~django_xworkflows.models.TransitionLog.from_state`
-      and :attr:`~django_xworkflows.models.TransitionLog.to_state`.
+*New:*
+
+    * Add rebuild_transitionlog_states management command to refill :attr:`~django_xworkflows.models.BaseTransitionLog.from_state`
+      and :attr:`~django_xworkflows.models.BaseTransitionLog.to_state`.
+    * Add indexes on various :class:`django_xworkflows.models.BaseTransitionLog` fields
+
+*Bugfix:*
+
+    * Fix :class:`django_xworkflows.models.WorkflowEnabled` inheritance
 
 0.4.5 (12/06/2012)
 ------------------
@@ -20,7 +27,7 @@ ChangeLog
 
 *Bugfix:*
 
-    * Serialize unicode of :attr:`xworkflows.State.title` in south ORM freezing.
+    * Serialize unicode of :attr:`xworkflows.base.State.title` in south ORM freezing.
 
 0.4.3 (29/05/2012)
 ------------------
@@ -43,7 +50,7 @@ ChangeLog
 
     * Avoid circular import issues when resolving :attr:`~django_xworkflows.models.Workflow.log_model`
       to a :class:`~django.db.models.Model`
-    * Log source and target state names in :class:`~django_xworkflows.models.TransitionLog`
+    * Log source and target state names in :class:`~django_xworkflows.models.BaseTransitionLog`
 
 0.4.0 (29/04/2012)
 ------------------
