@@ -1,0 +1,5 @@
+This minimalistic django project helps to generate the adequate south migrations.
+
+Simply run::
+
+    ./manage.py schemamigration --auto xworkflow_log <some_descriptive_name>
