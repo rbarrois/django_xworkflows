@@ -248,15 +248,20 @@ class BaseTransitionLog(models.Model):
                                      verbose_name=_(u"Content type"),
                                      related_name="workflow_object",
                                      blank=True, null=True)
-    content_id = models.PositiveIntegerField(_(u"Content id"), blank=True, null=True)
+    content_id = models.PositiveIntegerField(_(u"Content id"),
+        blank=True, null=True, db_index=True)
     modified_object = generic.GenericForeignKey(
             ct_field="content_type",
             fk_field="content_id")
 
-    transition = models.CharField(_(u"transition"), max_length=255)
-    from_state = models.CharField(_(u"from state"), max_length=255)
-    to_state = models.CharField(_(u"to state"), max_length=255)
-    timestamp = models.DateTimeField(_(u"performed at"), default=datetime.datetime.now)
+    transition = models.CharField(_(u"transition"), max_length=255,
+        db_index=True)
+    from_state = models.CharField(_(u"from state"), max_length=255,
+        db_index=True)
+    to_state = models.CharField(_(u"to state"), max_length=255,
+        db_index=True)
+    timestamp = models.DateTimeField(_(u"performed at"),
+        default=datetime.datetime.now, db_index=True)
 
     class Meta:
         ordering = ('-timestamp', 'transition')
