@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from .. import models
 
 
-class TransitionLog(models.BaseTransitionLog):
+class TransitionLog(models.GenericTransitionLog):
     """The log for a transition.
 
     Attributes:
@@ -22,6 +22,11 @@ class TransitionLog(models.BaseTransitionLog):
             actual model to use here is defined in the XWORKFLOWS_USER_MODEL
             setting.
     """
+    # Additional keyword arguments to store, if provided
+    EXTRA_LOG_ATTRIBUTES = (
+        ('user', 'user', None),  # Store the 'user' kwarg to transitions.
+    )
+
     user = django_models.ForeignKey(
         getattr(settings, 'XWORKFLOWS_USER_MODEL', 'auth.User'),
         blank=True, null=True, verbose_name=_(u"author"))
