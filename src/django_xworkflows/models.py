@@ -216,8 +216,7 @@ class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
         """
         # No need to override the 'field_name' from attrs: it already contains
         # a valid value, and that would clash with django model inheritance.
-        implems = base.ImplementationList(field_name, state_field.workflow)
-        implems.transform(attrs)
+        pass
 
 
 class WorkflowEnabled(base.BaseWorkflowEnabled):

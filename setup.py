@@ -38,7 +38,7 @@ setup(
         'django_xworkflows.management',
         'django_xworkflows.management.commands',
     ],
-    install_requires=['xworkflows >=0.3.0', 'django >=1.3'],
+    install_requires=['xworkflows >=0.4.0', 'django >=1.3'],
     tests_require=['unittest2'],
     classifiers=[
         "Development Status :: 3 - Alpha",
