@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+0.6.0 (02/08/2012)
+------------------
+
+*New:*
+
+    * Enable support for `XWorkflows 0.4.0 <http://pypi.python.org/pypi/xworkflows/0.4.0/>`_
+
 0.5.0 (14/07/2012)
 ------------------
 
