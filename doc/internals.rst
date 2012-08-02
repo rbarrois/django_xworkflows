@@ -13,7 +13,7 @@ Binding to a workflow
 The mechanism to bind a django model to a :class:`xworkflows.Workflow` relies on the :class:`WorkflowEnabled` and :class:`StateField` classes.
 
 
-.. class:: StateField(django.models.Field)
+.. class:: StateField(django.db.models.Field)
 
     This class is a simple Django :class:`~django.db.models.Field`, specifically tuned for a
     :class:`Workflow`.
@@ -78,12 +78,8 @@ Transitions mostly follow XWorkflows' mechanism.
 
 .. class:: TransactionalImplementationWrapper(xworkflows.base.ImplementationWrapper)
 
-    This specific wrapper runs all transition-related code
-    (:attr:`transition_check hooks <xworkflows.transition_check>`,
-    :attr:`before_transition hooks <xworkflows.before_transition>`,
-    implementation,
-    :attr:`~xworkflows.base.Workflow.log_transition`,
-    :attr:`after_transition hooks <xworkflows.after_transition>`) in a single database transaction.
+    This specific wrapper runs all transition-related code, including :class:`hooks <xworkflows.base.Hook>`,
+    in a single database transaction.
 
 
 The :class:`TransactionalImplementationWrapper` can be enabled by setting it to
@@ -104,11 +100,19 @@ of a :class:`Workflow`::
 
     .. attribute:: log_model
 
-        This holds the model to use to log to the database.
+        This holds the name of the model to use to log to the database.
         If empty, no database logging is performed.
 
 
-    .. method:: db_log(self, transition, from_state, instance, user=None, *args, **kwargs)
+    .. attribute:: log_model_class
+
+        This holds the class of the model to use to log to the database.
+
+        Takes precedence over :attr:`log_model`. If this attribute is empty but
+        :attr:`log_model` has been provided, it will be filled at first access.
+
+
+    .. method:: db_log(self, transition, from_state, instance, *args, **kwargs)
 
         .. fix VIM coloring **
 
@@ -121,17 +125,17 @@ of a :class:`Workflow`::
         - :class:`~django.db.models.ForeignKey` to the user responsible for the transition
         - timestamp of the operation
 
-        The default :class:`BaseTransitionLog` model is :class:`django_xworkflows.xworkflow_log.models.TransitionLog`,
-        but an alternative one can be specified in :attr:`log_model`.
+        The default :class:`TransitionLog <BaseTransitionLog>` model is :class:`django_xworkflows.xworkflow_log.models.TransitionLog`,
+        but an alternative one can be specified in :attr:`log_model` or :attr:`log_model_class`.
 
-        .. hint:: Override this method to log to a custom :class:`BaseTransitionLog` without generic foreign keys.
+        .. hint:: Override this method to log to a custom TransitionLog with complex fields and storage.
 
 
     .. method:: log_transition(self, transition, from_state, instance, save=True, log=True, *args, **kwargs)
 
         .. fix VIM coloring **
 
-        In addition to :func:`xworkflows.Workflow.log_transition`, additional actions are performed:
+        In addition to :meth:`xworkflows.Workflow.log_transition`, additional actions are performed:
 
         - If :attr:`save` is ``True``, the instance is saved.
         - If :attr:`log` is ``True``, the :func:`db_log` method is called to register the
@@ -141,61 +145,124 @@ of a :class:`Workflow`::
 Transition logs
 ===============
 
+Transition logs can be stored in the database. This is performed by the :meth:`~Workflow.db_log` method of the :class:`Workflow` class.
 
-.. class:: BaseTransitionLog
+The default method will save informations about the transition into an adapted model.
+The actual model to log will be:
 
-    This abstract model describes which fields are expected when logging a transition to the database.
+- The model whose class is set to the :attr:`Workflow.log_model_class` attribute
+- The model whose name (in an ``app_label.ModelClass`` format) is set to the :attr:`Workflow.log_model` attribute
+- The :class:`django_xworkflows.xworkflow_log.models.TransitionLog` model if ``django_xworkflows.xworkflow_log``
+  belongs to :data:`settings.INSTALLED_APPS <django.setting.INSTALLED_APPS>`
+- Nothing if none of the above match
 
-    The default for all :class:`WorkflowEnabled` subclasses will be to log to
-    :class:`django_xworkflows.xworkflow_log.models.TransitionLog` instances.
+Such models are expected to have a few fields, a good basis for writing your own is to
+inherit from either :class:`BaseTransitionLog` or :class:`GenericTransitionLog` (which provides a default storage through a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`).
 
-    This behaviour can be altered by setting the :attr:`~Workflow.log_model` attribute of :class:`Workflow` definition.
+The :class:`BaseTransitionLog` class provides all required fields for logging a transition.
 
-    .. attribute:: modified_object
 
-        A :class:`~django.contrib.contenttypes.generic.GenericForeignKey` to the :class:`WorkflowEnabled` being modified.
+.. class:: BaseTransitionLog(models.Model)
+
+    This class provides minimal functions for logging a transition to the database.
 
     .. attribute:: transition
 
-        The name of the transition performed
-
-        :type: str
+        This attribute holds the name of the performed transition, as a string.
 
     .. attribute:: from_state
 
-        The name of the source state for the transition
-
-        :type: str
+        Name of the source state, as a string.
 
     .. attribute:: to_state
 
-        The name of the destination state for the transition
-
-        :type: str
+        Name of the target state, as a string.
 
     .. attribute:: timestamp
 
-        The time at which the transition occurred.
+        Timestamp of the operation, as a :class:`~django.db.models.DateTimeField`.
 
-        :type: datetime.datetime
 
+    .. attribute:: MODIFIED_OBJECT_FIELD
+
+        Name of the field where the modified instance should be passed.
+        Logging the transition will likely fail if this is not provided.
+
+    .. attribute:: EXTRA_LOG_ATTRIBUTES
+
+        It may be useful to log extra transition kwarg (``user``, ...) to the database.
+        This attribute describes how to log those extra keyword arguments.
+
+        It takes the form of a list of 3-tuples ``(db_field, kwarg, default)``.
+        When logging to the database, the ``db_field`` attribute of the :class:`BaseTransitionLog` instance
+        will be filled with the keyword argument passed to the transition at ``kwarg``, if
+        any. Otherwise, ``default`` will be used.
+
+
+    .. method:: get_modified_object(self)
+
+        Abstract the lookup of the modified object through :attr:`MODIFIED_OBJECT_FIELD`.
+
+
+.. class:: GenericTransitionLog(BaseTransitionLog)
+
+    An extended version of :class:`BaseTransitionLog` uses a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
+    to store the modified object.
+
+    .. attribute:: content_type
+
+        A foreign key to the :class:`~django.contrib.contenttypes.models.ContentType` of
+        the modified object
+
+    .. attribute:: content_id
+
+        The primary key of the modified object
+
+    .. attribute:: modified_object
+
+        The :class:`~django.contrib.contenttypes.generic.GenericForeignKey` pointing to the
+        modified object.
+
+
+Here is an example of a custom ``TransitionLog`` model::
+
+    # Note that we inherit from BaseTransitionLog, not GenericTransitionLog.
+    class MyDocumentTransitionLog(django_xworkflows.models.BaseTransitionLog):
+
+        # This is where we'll store the modified object
+        document = models.ForeignKey(Document)
+
+        # Extra data to keep about transitions
+        user = models.ForeignKey(auth_models.User, blank=True, null=True)
+        client = models.ForeignKey(api_models.Client, blank=True, null=True)
+        source_ip = models.CharField(max_length=24, blank=True)
+
+        # Set the name of the field where the modified object goes
+        MODIFIED_OBJECT_FIELD = 'document'
+
+        # Define extra logging attributes
+        EXTRA_LOG_ATTRIBUTES = (
+            ('user', 'user', None),
+            ('client', 'api_client', None),  # Transitions are called with 'api_client' kwarg
+            ('source_ip', 'ip', ''),  # Transitions are called with 'ip' kwarg
+        )
 
 
 .. module:: django_xworkflows.xworkflow_log.models
     :synopsis: Keep an example :class:`~django_xworkflows.models.BaseTransitionLog` model,
       with admin and translations.
 
-An example :class:`~django_xworkflows.models.BaseTransitionLog` model is available in the ``django_xworkflows.xworkflow_log`` application.
-Including it to :attr:`~django.conf.settings.INSTALLED_APPS` will enable database
+An example :class:`TransitionLog` model is available in the ``django_xworkflows.xworkflow_log`` application.
+Including it to :data:`settings.INSTALLED_APPS` will enable database
 logging of transitions for all :class:`~django_xworkflows.models.WorkflowEnabled` subclasses.
 
-.. class:: TransitionLog(BaseTransitionLog)
+.. class:: TransitionLog(GenericTransitionLog)
 
-    This specific :class:`~django_xworkflows.models.BaseTransitionLog` also stores the user responsible for the
-    transition, if provided.
+    This specific :class:`~django_xworkflows.models.GenericTransitionLog` also stores
+    the user responsible for the transition, if provided.
 
     The exact :class:`~django.db.models.Model` to use for that foreign key can be set
-    in the :const:`XWORKFLOWS_USER_MODEL` setting (defaults to ``'auth.User'``, which
+    in the :const:`XWORKFLOWS_USER_MODEL` django setting (defaults to ``'auth.User'``, which
     uses :class:`django.contrib.auth.models.User`).
 
 
