@@ -342,19 +342,25 @@ class Workflow(base.Workflow):
     #: Save log to this django model (name of the model)
     log_model = get_default_log_model()
 
+    #: Save log to this django model (actual class)
+    log_model_class = None
+
     def __init__(self, *args, **kwargs):
         # Fetch 'log_model' if overridden.
         log_model = kwargs.pop('log_model', self.log_model)
 
+        # Fetch 'log_model_class' if overridden.
+        log_model_class = kwargs.pop('log_model_class', self.log_model_class)
+
         super(Workflow, self).__init__(*args, **kwargs)
 
         self.log_model = log_model
-        self.log_model_class = None
+        self.log_model_class = log_model_class
 
     def _get_log_model_class(self):
         """Cache for fetching the actual log model object once django is loaded.
 
-        Otherwise, import conflict occur: WorkflowEnabled import <log_model>
+        Otherwise, import conflict occur: WorkflowEnabled imports <log_model>
         which tries to import all models to retrieve the proper model class.
         """
         if self.log_model_class is not None:
