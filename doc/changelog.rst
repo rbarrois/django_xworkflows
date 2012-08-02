@@ -1,6 +1,16 @@
 ChangeLog
 =========
 
+0.7.0 (current)
+---------------
+
+*New:*
+
+    * Provide a base :class:`~django_xworkflows.models.BaseTransitionLog` without :class:`~django.contrib.contenttypes.generic.GenericForeignKey`.
+    * Ease specification of transition kwargs to store in custom :class:`TransitionLog <django_xworkflows.models.BaseTransitionLog>` classes
+    * Allow settings :attr:`~django_xworkflows.models.Workflow.log_model_class` explicitly (thus bypassing the lookup performed by
+      :attr:`~django_xworkflows.models.Workflow.log_model`).
+
 0.6.0 (02/08/2012)
 ------------------
 
