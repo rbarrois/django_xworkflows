@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2011-2012 Raphaël Barrois
 
+from django import VERSION as django_version
 from django.core import exceptions
 from django.core import serializers
 from django.db import models as django_models
@@ -104,7 +105,12 @@ class ModelTestCase(unittest.TestCase):
     def test_invalid_dump(self):
         data = '[{"pk": 1, "model": "djworkflows.myworkflowenabled", "fields": {"state": "blah"}}]'
 
-        self.assertRaises(exceptions.ValidationError, list,
+        if django_version[:3] >= (1, 4, 0):
+            error_class = serializers.base.DeserializationError
+        else:
+            error_class = exceptions.ValidationError
+
+        self.assertRaises(error_class, list,
             serializers.deserialize('json', data))
 
 
