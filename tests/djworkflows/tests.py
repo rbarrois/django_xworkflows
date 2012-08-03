@@ -166,6 +166,12 @@ class TransitionTestCase(unittest.TestCase):
         self.obj.foobar()
         self.assertEqual('abab', self.obj.gobaz('ab'))
 
+    def test_hook(self):
+        self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
+        self.assertEqual('', self.obj.other)
+        self.obj.foobar()
+        self.assertEqual('aaa', self.obj.other)
+
     def test_logging(self):
         xwlog_models.TransitionLog.objects.all().delete()
 

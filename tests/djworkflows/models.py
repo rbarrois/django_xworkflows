@@ -2,6 +2,7 @@
 # Copyright (c) 2011-2012 Raphaël Barrois
 
 from django.db import models
+import xworkflows
 
 from django_xworkflows import models as dxmodels
 
@@ -53,6 +54,10 @@ class MyWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
     @dxmodels.transition(after=fail_if_fortytwo)
     def gobaz(self, foo, save=True):
         return foo * 2
+
+    @xworkflows.on_enter_state('bar')
+    def hook_enter_baz(self, *args, **kwargs):
+        self.other = 'aaa'
 
 
 class WithTwoWorkflows(dxmodels.WorkflowEnabled, models.Model):
