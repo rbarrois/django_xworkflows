@@ -27,6 +27,28 @@ class ModelTestCase(unittest.TestCase):
         self.assertEqual(models.MyWorkflow.states,
                          models.MyWorkflowEnabled._workflows['state'].workflow.states)
 
+    def test_field_attributes(self):
+        field_def = models.MyWorkflowEnabled._meta.get_field_by_name('state')[0]
+        self.assertEqual(16, field_def.max_length)
+        self.assertFalse(field_def.blank)
+        self.assertFalse(field_def.null)
+        self.assertEqual(models.MyWorkflow.initial_state.name, field_def.default)
+        self.assertEqual(
+            list((st.name, st.title) for st in models.MyWorkflow.states),
+            field_def.choices,
+        )
+
+    def test_ald_field_attributes(self):
+        field_def = models.WithTwoWorkflows._meta.get_field_by_name('state2')[0]
+        self.assertEqual(19, field_def.max_length)
+        self.assertFalse(field_def.blank)
+        self.assertFalse(field_def.null)
+        self.assertEqual(models.MyAltWorkflow.initial_state.name, field_def.default)
+        self.assertEqual(
+            list((st.name, st.title) for st in models.MyAltWorkflow.states),
+            field_def.choices,
+        )
+
     def test_dual_workflows(self):
         self.assertIn('state1', models.WithTwoWorkflows._workflows)
         self.assertIn('state2', models.WithTwoWorkflows._workflows)
@@ -232,7 +254,10 @@ class TransitionTestCase(unittest.TestCase):
 class SouthTestCase(unittest.TestCase):
     """Tests south-related behavior."""
 
-    frozen_workflow = "__import__('xworkflows', globals(), locals()).base.WorkflowMeta('MyWorkflow', (), {'states': (('foo', u'Foo'), ('bar', u'Bar'), ('baz', u'Baz')), 'initial_state': 'foo'})"
+    frozen_workflow = (
+        "__import__('xworkflows', globals(), locals()).base.WorkflowMeta("
+        "'MyWorkflow', (), {'states': (('foo', u'Foo'), ('bar', u'Bar'), "
+        "('baz', u'Baz')), 'initial_state': 'foo'})")
 
     def test_south_triple(self):
         field = models.MyWorkflowEnabled._meta.get_field_by_name('state')[0]
@@ -244,7 +269,7 @@ class SouthTestCase(unittest.TestCase):
                 [],  # *args
                 {
                     'default': "'foo'",
-                    'max_length': '3',
+                    'max_length': '16',
                     'workflow': self.frozen_workflow},  # **kwargs
             ), triple)
 

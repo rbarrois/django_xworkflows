@@ -27,6 +27,7 @@ class MyAltWorkflow(dxmodels.Workflow):
         ('a', 'StateA'),
         ('b', 'StateB'),
         ('c', 'StateC'),
+        ('something_very_long', u"A very long name"),
     )
     transitions = (
         ('tob', ('a', 'c'), 'b'),

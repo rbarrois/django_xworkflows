@@ -80,12 +80,18 @@ class StateField(models.Field):
     }
     description = _(u"State")
 
+    DEFAULT_MAX_LENGTH = 16
+
     def __init__(self, workflow, **kwargs):
         if isinstance(workflow, type):
             workflow = workflow()
         self.workflow = workflow
-        kwargs['choices'] = list((st.name, st.title) for st in self.workflow.states)
-        kwargs['max_length'] = max(len(st.name) for st in self.workflow.states)
+        kwargs['choices'] = list(
+            (st.name, st.title) for st in self.workflow.states)
+
+        kwargs['max_length'] = max(
+            kwargs.get('max_length', self.DEFAULT_MAX_LENGTH),
+            max(len(st.name) for st in self.workflow.states))
         kwargs['blank'] = False
         kwargs['null'] = False
         kwargs['default'] = self.workflow.initial_state.name
