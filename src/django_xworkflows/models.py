@@ -15,9 +15,13 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 
 try:
-    from django.utils.timezone import now
+    from django.utils import timezone
+    now = timezone.now
+    del timezone
 except ImportError:
-    from datetime.datetime import now
+    import datetime
+    now = datetime.now
+    del datetime
 
 from xworkflows import base
 
