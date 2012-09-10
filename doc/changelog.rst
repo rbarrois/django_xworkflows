@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+0.7.1 (10/09/2012)
+------------------
+
+*Bugfix:*
+
+    * Use :meth:`django.utils.timezone.now` instead of :meth:`datetime.datetime.now` with Django >= 1.4
+
 0.7.0 (17/08/2012)
 ------------------
 
