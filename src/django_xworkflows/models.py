@@ -3,8 +3,6 @@
 
 """Specific versions of XWorkflows to use with Django."""
 
-import datetime
-
 from django.db import models
 from django.db import transaction
 from django.conf import settings
@@ -15,6 +13,11 @@ from django.forms import fields
 from django.forms import widgets
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
+
+try:
+    from django.utils.timezone import now
+except ImportError:
+    from datetime.datetime import now
 
 from xworkflows import base
 
@@ -269,7 +272,7 @@ class BaseTransitionLog(models.Model):
     to_state = models.CharField(_(u"to state"), max_length=255,
         db_index=True)
     timestamp = models.DateTimeField(_(u"performed at"),
-        default=datetime.datetime.now, db_index=True)
+        default=now, db_index=True)
 
     class Meta:
         ordering = ('-timestamp', 'transition')
