@@ -20,7 +20,7 @@ try:
     del timezone
 except ImportError:
     import datetime
-    now = datetime.now
+    now = datetime.datetime.now
     del datetime
 
 from xworkflows import base
