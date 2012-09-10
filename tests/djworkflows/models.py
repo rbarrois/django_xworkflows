@@ -56,7 +56,7 @@ class MyWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
     def gobaz(self, foo, save=True):
         return foo * 2
 
-    @xworkflows.on_enter_state('bar')
+    @xworkflows.on_enter_state(MyWorkflow.states.bar)
     def hook_enter_baz(self, *args, **kwargs):
         self.other = 'aaa'
 
