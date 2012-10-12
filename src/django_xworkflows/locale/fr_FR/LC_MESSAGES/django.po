@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-15 17:54+0200\n"
+"POT-Creation-Date: 2012-10-12 18:33+0200\n"
 "PO-Revision-Date: 2011-09-12 20:43+0200\n"
 "Last-Translator: Raphaël Barrois <raphael.barrois@xelmail.com>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -16,61 +16,69 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: models.py:58
+#: models.py:83
 msgid "Choose a valid state."
 msgstr "Choisissez un état valide."
 
-#: models.py:59
+#: models.py:84
 #, python-format
 msgid "Please enter a valid value (got %r)."
 msgstr "Veuillez saisir une entrée valide (%r reçu)."
 
-#: models.py:60
+#: models.py:85
 #, python-format
 msgid "Please enter a value from the right workflow (got %r)."
 msgstr "Veuillez choisir un état du bon workflow (%r reçu)."
 
-#: models.py:61
+#: models.py:86
 #, python-format
 msgid "%s is not a valid state."
 msgstr "%s n'est pas un état valide"
 
-#: models.py:63
+#: models.py:88
 msgid "State"
 msgstr "État"
 
-#: xworkflow_log/models.py:24
-msgid "Content type"
-msgstr "Type de contenu"
-
-#: xworkflow_log/models.py:27
-msgid "Content id"
-msgstr "ID du contenu"
-
-#: xworkflow_log/models.py:32
+#: models.py:357
 msgid "transition"
 msgstr "transition"
 
-#: xworkflow_log/models.py:33
+#: models.py:359
 msgid "from state"
 msgstr "depuis l'état"
 
-#: xworkflow_log/models.py:34
+#: models.py:361
 msgid "to state"
 msgstr "pour l'état"
 
-#: xworkflow_log/models.py:37
-msgid "author"
-msgstr "auteur"
-
-#: xworkflow_log/models.py:38
+#: models.py:363
 msgid "performed at"
 msgstr "effectuée à"
 
-#: xworkflow_log/models.py:42
+#: models.py:368 models.py:419
 msgid "XWorkflow transition log"
 msgstr "log de transition (XWorkflow)"
 
-#: xworkflow_log/models.py:43
+#: models.py:369 models.py:420
 msgid "XWorkflow transition logs"
 msgstr "logs de transition (XWorkflow)"
+
+#: models.py:408 models.py:473
+msgid "Content type"
+msgstr "Type de contenu"
+
+#: models.py:411 models.py:476
+msgid "Content id"
+msgstr "ID du contenu"
+
+#: models.py:428 models.py:483
+msgid "XWorkflow last transition log"
+msgstr "log de dernière transition (XWorkflow)"
+
+#: models.py:429 models.py:484
+msgid "XWorkflow last transition logs"
+msgstr "logs de dernière transition (XWorkflow)"
+
+#: xworkflow_log/models.py:32
+msgid "author"
+msgstr "auteur"
