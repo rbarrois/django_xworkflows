@@ -244,88 +244,6 @@ class WorkflowEnabled(base.BaseWorkflowEnabled):
             return super(WorkflowEnabled, self)._get_FIELD_display(field)
 
 
-class BaseTransitionLog(models.Model):
-    """Abstract model for a minimal database logging setup.
-
-    Class attributes:
-        MODIFIED_OBJECT_FIELD (str): name of the field storing the modified
-            object.
-        EXTRA_LOG_ATTRIBUTES ((db_field, kwarg, default) list): Describes extra
-            transition kwargs to store:
-            - db_field is the name of the attribute where data should be stored
-            - kwarg is the name of the keyword argument of the transition to
-              record
-            - default is the default value to store if no value was provided for
-              kwarg in the transition's arguments
-
-    Attributes:
-        modified_object (django.db.model.Model): the object affected by this
-            transition.
-        from_state (str): the name of the origin state
-        to_state (str): the name of the destination state
-        transition (str): The name of the transition being performed.
-        timestamp (datetime): The time at which the Transition was performed.
-    """
-    MODIFIED_OBJECT_FIELD = ''
-    EXTRA_LOG_ATTRIBUTES = ()
-
-    transition = models.CharField(_(u"transition"), max_length=255,
-        db_index=True)
-    from_state = models.CharField(_(u"from state"), max_length=255,
-        db_index=True)
-    to_state = models.CharField(_(u"to state"), max_length=255,
-        db_index=True)
-    timestamp = models.DateTimeField(_(u"performed at"),
-        default=now, db_index=True)
-
-    class Meta:
-        ordering = ('-timestamp', 'transition')
-        verbose_name = _(u'XWorkflow transition log')
-        verbose_name_plural = _(u'XWorkflow transition logs')
-        abstract = True
-
-    def get_modified_object(self):
-        if self.MODIFIED_OBJECT_FIELD:
-            return getattr(self, self.MODIFIED_OBJECT_FIELD, None)
-        return None
-
-    def __unicode__(self):
-        return u'%r: %s -> %s at %s' % (self.get_modified_object(),
-            self.from_state, self.to_state, self.timestamp.isoformat())
-
-
-class GenericTransitionLog(BaseTransitionLog):
-    """Abstract model for a minimal database logging setup.
-
-    Specializes BaseTransitionLog to use a GenericForeignKey.
-
-    Attributes:
-        modified_object (django.db.model.Model): the object affected by this
-            transition.
-        from_state (str): the name of the origin state
-        to_state (str): the name of the destination state
-        transition (str): The name of the transition being performed.
-        timestamp (datetime): The time at which the Transition was performed.
-    """
-    MODIFIED_OBJECT_FIELD = 'modified_object'
-
-    content_type = models.ForeignKey(ct_models.ContentType,
-                                     verbose_name=_(u"Content type"),
-                                     related_name="workflow_object",
-                                     blank=True, null=True)
-    content_id = models.PositiveIntegerField(_(u"Content id"),
-        blank=True, null=True, db_index=True)
-    modified_object = generic.GenericForeignKey(
-            ct_field="content_type",
-            fk_field="content_id")
-
-    class Meta:
-        ordering = ('-timestamp', 'transition')
-        verbose_name = _(u'XWorkflow transition log')
-        verbose_name_plural = _(u'XWorkflow transition logs')
-        abstract = True
-
-
 def get_default_log_model():
     """The default log model depends on whether the xworkflow_log app is there."""
     if 'django_xworkflows.xworkflow_log' in settings.INSTALLED_APPS:
@@ -392,11 +310,12 @@ class Workflow(base.Workflow):
             for db_field, transition_arg, default in model_class.EXTRA_LOG_ATTRIBUTES:
                 extras[db_field] = kwargs.get(transition_arg, default)
 
-            model_class.objects.create(modified_object=instance,
-                                       transition=transition.name,
-                                       from_state=from_state.name,
-                                       to_state=transition.target.name,
-                                       **extras)
+            return model_class.log_transition(
+                    modified_object=instance,
+                   transition=transition.name,
+                   from_state=from_state.name,
+                   to_state=transition.target.name,
+                   **extras)
 
     def log_transition(self, transition, from_state, instance, *args, **kwargs):
         """Generic transition logging."""
@@ -408,3 +327,172 @@ class Workflow(base.Workflow):
             instance.save()
         if log:
             self.db_log(transition, from_state, instance, *args, **kwargs)
+
+
+class BaseTransitionLog(models.Model):
+    """Abstract model for a minimal database logging setup.
+
+    Class attributes:
+        MODIFIED_OBJECT_FIELD (str): name of the field storing the modified
+            object.
+        EXTRA_LOG_ATTRIBUTES ((db_field, kwarg, default) list): Describes extra
+            transition kwargs to store:
+            - db_field is the name of the attribute where data should be stored
+            - kwarg is the name of the keyword argument of the transition to
+              record
+            - default is the default value to store if no value was provided for
+              kwarg in the transition's arguments
+
+    Attributes:
+        modified_object (django.db.model.Model): the object affected by this
+            transition.
+        from_state (str): the name of the origin state
+        to_state (str): the name of the destination state
+        transition (str): The name of the transition being performed.
+        timestamp (datetime): The time at which the Transition was performed.
+    """
+    MODIFIED_OBJECT_FIELD = ''
+    EXTRA_LOG_ATTRIBUTES = ()
+
+    transition = models.CharField(_(u"transition"), max_length=255,
+        db_index=True)
+    from_state = models.CharField(_(u"from state"), max_length=255,
+        db_index=True)
+    to_state = models.CharField(_(u"to state"), max_length=255,
+        db_index=True)
+    timestamp = models.DateTimeField(_(u"performed at"),
+        default=now, db_index=True)
+
+    class Meta:
+        ordering = ('-timestamp', 'transition')
+        verbose_name = _(u'XWorkflow transition log')
+        verbose_name_plural = _(u'XWorkflow transition logs')
+        abstract = True
+
+    def get_modified_object(self):
+        if self.MODIFIED_OBJECT_FIELD:
+            return getattr(self, self.MODIFIED_OBJECT_FIELD, None)
+        return None
+
+    @classmethod
+    def log_transition(cls, transition, from_state, to_state, modified_object, **kwargs):
+        kwargs.update({
+            'transition': transition,
+            'from_state': from_state,
+            'to_state': to_state,
+            cls.MODIFIED_OBJECT_FIELD: modified_object,
+        })
+        return cls.objects.create(**kwargs)
+
+    def __unicode__(self):
+        return u'%r: %s -> %s at %s' % (self.get_modified_object(),
+            self.from_state, self.to_state, self.timestamp.isoformat())
+
+
+class GenericTransitionLog(BaseTransitionLog):
+    """Abstract model for a minimal database logging setup.
+
+    Specializes BaseTransitionLog to use a GenericForeignKey.
+
+    Attributes:
+        modified_object (django.db.model.Model): the object affected by this
+            transition.
+        from_state (str): the name of the origin state
+        to_state (str): the name of the destination state
+        transition (str): The name of the transition being performed.
+        timestamp (datetime): The time at which the Transition was performed.
+    """
+    MODIFIED_OBJECT_FIELD = 'modified_object'
+
+    content_type = models.ForeignKey(ct_models.ContentType,
+                                     verbose_name=_(u"Content type"),
+                                     related_name="workflow_object",
+                                     blank=True, null=True)
+    content_id = models.PositiveIntegerField(_(u"Content id"),
+        blank=True, null=True, db_index=True)
+    modified_object = generic.GenericForeignKey(
+            ct_field="content_type",
+            fk_field="content_id")
+
+    class Meta:
+        ordering = ('-timestamp', 'transition')
+        verbose_name = _(u'XWorkflow transition log')
+        verbose_name_plural = _(u'XWorkflow transition logs')
+        abstract = True
+
+
+class BaseLastTransitionLog(BaseTransitionLog):
+    """Alternate abstract model holding only the latest transition."""
+
+    class Meta:
+        verbose_name = _(u'XWorkflow last transition log')
+        verbose_name_plural = _(u'XWorkflow last transition logs')
+        abstract = True
+
+    @classmethod
+    def _update_or_create(cls, unique_fields, **kwargs):
+        last_transition, created = cls.objects.get_or_create(defaults=kwargs, **unique_fields)
+        if not created:
+            for field, value in kwargs.items():
+                setattr(last_transition, field, value)
+            last_transition.save()
+
+        return last_transition
+
+    @classmethod
+    def log_transition(cls, transition, from_state, to_state, modified_object, **kwargs):
+        kwargs.update({
+            'transition': transition,
+            'from_state': from_state,
+            'to_state': to_state,
+        })
+
+        non_defaults = {
+            cls.MODIFIED_OBJECT_FIELD: modified_object,
+        }
+
+        return cls._update_or_create(non_defaults, **kwargs)
+
+
+class GenericLastTransitionLog(BaseLastTransitionLog):
+    """Abstract model for a minimal database logging setup.
+
+    Specializes BaseLastTransitionLog to use a GenericForeignKey.
+
+    Attributes:
+        modified_object (django.db.model.Model): the object affected by this
+            transition.
+        from_state (str): the name of the origin state
+        to_state (str): the name of the destination state
+        transition (str): The name of the transition being performed.
+        timestamp (datetime): The time at which the Transition was performed.
+    """
+    MODIFIED_OBJECT_FIELD = 'modified_object'
+
+    content_type = models.ForeignKey(ct_models.ContentType,
+                                     verbose_name=_(u"Content type"),
+                                     related_name='last_transition_logs',
+                                     blank=True, null=True)
+    content_id = models.PositiveIntegerField(_(u"Content id"),
+        blank=True, null=True, db_index=True)
+    modified_object = generic.GenericForeignKey(
+            ct_field="content_type",
+            fk_field="content_id")
+
+    class Meta:
+        verbose_name = _(u'XWorkflow last transition log')
+        verbose_name_plural = _(u'XWorkflow last transition logs')
+        abstract = True
+        unique_together =  ('content_type', 'content_id')
+
+    @classmethod
+    def _update_or_create(cls, unique_fields, **kwargs):
+        modified_object = unique_fields.pop(cls.MODIFIED_OBJECT_FIELD)
+        content_type = ct_models.ContentType.objects.get_for_model(modified_object.__class__)
+        content_id = modified_object.id
+
+        unique_fields['content_type'] = content_type
+        unique_fields['content_id'] = content_id
+
+        return super(GenericLastTransitionLog, cls)._update_or_create(unique_fields, **kwargs)
+

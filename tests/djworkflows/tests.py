@@ -252,6 +252,68 @@ class TransitionTestCase(test.TransactionTestCase):
         self.assertEqual(models.MyWorkflow.states.foo, obj.state)
 
 
+class LastTransitionLogTestCase(test.TestCase):
+    def setUp(self):
+        self.obj = models.SomeWorkflowEnabled.objects.create()
+
+    def test_transitions(self):
+        self.assertEqual(0, models.SomeWorkflowLastTransitionLog.objects.count())
+
+        self.obj.ab()
+        self.assertEqual(1, models.SomeWorkflowLastTransitionLog.objects.count())
+        tlog = models.SomeWorkflowLastTransitionLog.objects.get()
+        self.assertEqual(self.obj, tlog.obj)
+        self.assertEqual('ab', tlog.transition)
+        self.assertEqual('a', tlog.from_state)
+        self.assertEqual('b', tlog.to_state)
+
+    def test_two_transitions(self):
+        self.assertEqual(0, models.SomeWorkflowLastTransitionLog.objects.count())
+
+        self.obj.ab()
+        self.assertEqual(1, models.SomeWorkflowLastTransitionLog.objects.count())
+
+        self.obj.ba()
+        self.assertEqual(1, models.SomeWorkflowLastTransitionLog.objects.count())
+
+        tlog = models.SomeWorkflowLastTransitionLog.objects.get()
+        self.assertEqual(self.obj, tlog.obj)
+        self.assertEqual('ba', tlog.transition)
+        self.assertEqual('b', tlog.from_state)
+        self.assertEqual('a', tlog.to_state)
+
+
+class GenericLastTransitionLogTestCase(test.TestCase):
+    def setUp(self):
+        self.obj = models.GenericWorkflowEnabled.objects.create()
+
+    def test_transitions(self):
+        self.assertEqual(0, models.GenericWorkflowLastTransitionLog.objects.count())
+
+        self.obj.ab()
+        self.assertEqual(1, models.GenericWorkflowLastTransitionLog.objects.count())
+        tlog = models.GenericWorkflowLastTransitionLog.objects.get()
+        self.assertEqual(self.obj, tlog.modified_object)
+        self.assertEqual('ab', tlog.transition)
+        self.assertEqual('a', tlog.from_state)
+        self.assertEqual('b', tlog.to_state)
+
+    def test_two_transitions(self):
+        self.assertEqual(0, models.GenericWorkflowLastTransitionLog.objects.count())
+
+        self.obj.ab()
+        self.assertEqual(1, models.GenericWorkflowLastTransitionLog.objects.count())
+
+        self.obj.ba()
+        self.assertEqual(1, models.GenericWorkflowLastTransitionLog.objects.count())
+
+        tlog = models.GenericWorkflowLastTransitionLog.objects.get()
+        self.assertEqual(self.obj, tlog.modified_object)
+        self.assertEqual('ba', tlog.transition)
+        self.assertEqual('b', tlog.from_state)
+        self.assertEqual('a', tlog.to_state)
+
+
 @unittest.skipIf(south is None, "Couldn't import south.")
 class SouthTestCase(test.TestCase):
     """Tests south-related behavior."""

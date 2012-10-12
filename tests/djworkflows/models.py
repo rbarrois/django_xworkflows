@@ -64,3 +64,48 @@ class MyWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
 class WithTwoWorkflows(dxmodels.WorkflowEnabled, models.Model):
     state1 = dxmodels.StateField(MyWorkflow())
     state2 = dxmodels.StateField(MyAltWorkflow())
+
+
+class SomeWorkflowLastTransitionLog(dxmodels.BaseLastTransitionLog):
+    MODIFIED_OBJECT_FIELD = 'obj'
+    obj = models.OneToOneField('djworkflows.SomeWorkflowEnabled')
+
+
+class SomeWorkflow(dxmodels.Workflow):
+    states = (
+        ('a', 'A'),
+        ('b', 'B'),
+    )
+    transitions = (
+        ('ab', 'a', 'b'),
+        ('ba', 'b', 'a'),
+    )
+    initial_state = 'a'
+
+    log_model_class = SomeWorkflowLastTransitionLog
+
+
+class SomeWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
+    state = dxmodels.StateField(SomeWorkflow)
+
+
+class GenericWorkflowLastTransitionLog(dxmodels.GenericLastTransitionLog):
+    pass
+
+
+class GenericWorkflow(dxmodels.Workflow):
+    states = (
+        ('a', 'A'),
+        ('b', 'B'),
+    )
+    transitions = (
+        ('ab', 'a', 'b'),
+        ('ba', 'b', 'a'),
+    )
+    initial_state = 'a'
+
+    log_model_class = GenericWorkflowLastTransitionLog
+
+
+class GenericWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
+    state = dxmodels.StateField(GenericWorkflow)
