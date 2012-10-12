@@ -204,6 +204,14 @@ The :class:`BaseTransitionLog` class provides all required fields for logging a 
         Abstract the lookup of the modified object through :attr:`MODIFIED_OBJECT_FIELD`.
 
 
+    .. method:: log_transition(cls, transition, from_state, to_state, modified_object, **kwargs)
+
+        .. Fix VIM coloring ***
+
+        Save a new transition log from the given transition name, origin state name, target state name,
+        modified object and extra fields.
+
+
 .. class:: GenericTransitionLog(BaseTransitionLog)
 
     An extended version of :class:`BaseTransitionLog` uses a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
@@ -222,6 +230,21 @@ The :class:`BaseTransitionLog` class provides all required fields for logging a 
 
         The :class:`~django.contrib.contenttypes.generic.GenericForeignKey` pointing to the
         modified object.
+
+
+.. class:: BaseLastTransitionLog(BaseTransitionLog)
+
+    This alternate :class:`BaseTransitionLog` has been tuned to store only the last transition log
+    for an object, typically with a :class:`~django.db.models.OneToOneField`.
+
+    It handles update or creation on its own.
+
+
+.. class:: GenericLastTransitionLog(BaseLastTransitionLog)
+
+    This class is to :class:`BaseLastTransitionLog` what :class:`GenericTransitionLog` is to :class:`BaseTransitionLog`.
+    It holds the modified object through a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`, with the
+    adequate ``unique_together`` setting.
 
 
 Here is an example of a custom ``TransitionLog`` model::
