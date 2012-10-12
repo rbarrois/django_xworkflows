@@ -1,6 +1,14 @@
 ChangeLog
 =========
 
+0.8.0 (12/10/2012)
+------------------
+
+*New:*
+
+    * Provide a base :class:`~django_xworkflows.models.BaseLastTransitionLog` and a :class:`~django_xworkflows.models.GenericLastTransitionLog`,
+      useful for storing only the *last* transition log for a given model.
+
 0.7.1 (10/09/2012)
 ------------------
 
