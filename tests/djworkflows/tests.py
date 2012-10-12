@@ -5,6 +5,7 @@ from django import VERSION as django_version
 from django.core import exceptions
 from django.core import serializers
 from django.db import models as django_models
+from django import test
 from django.utils import unittest
 
 import xworkflows
@@ -22,7 +23,7 @@ except ImportError:
 from . import models
 
 
-class ModelTestCase(unittest.TestCase):
+class ModelTestCase(test.TestCase):
     def test_workflow(self):
         self.assertEqual(models.MyWorkflow.states,
                          models.MyWorkflowEnabled._workflows['state'].workflow.states)
@@ -136,7 +137,7 @@ class ModelTestCase(unittest.TestCase):
             serializers.deserialize('json', data))
 
 
-class InheritanceTestCase(unittest.TestCase):
+class InheritanceTestCase(test.TestCase):
     """Tests inheritance-related behaviour."""
     def test_simple(self):
         class BaseWorkflowEnabled(xwf_models.WorkflowEnabled, django_models.Model):
@@ -161,7 +162,8 @@ class InheritanceTestCase(unittest.TestCase):
         self.assertEqual(models.MyWorkflow.initial_state, obj.state)
 
 
-class TransitionTestCase(unittest.TestCase):
+# Not a standard TestCase, since we're testing transactions.
+class TransitionTestCase(test.TransactionTestCase):
 
     def setUp(self):
         self.obj = models.MyWorkflowEnabled()
@@ -251,7 +253,7 @@ class TransitionTestCase(unittest.TestCase):
 
 
 @unittest.skipIf(south is None, "Couldn't import south.")
-class SouthTestCase(unittest.TestCase):
+class SouthTestCase(test.TestCase):
     """Tests south-related behavior."""
 
     frozen_workflow = (
