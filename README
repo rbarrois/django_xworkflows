@@ -10,6 +10,7 @@ Django-XWorkflows allow to bind a Django model to a workflow, with a few extra f
 
 Define a workflow and add it to a model::
 
+    from django import models
     from django_xworkflows import models as xwf_models
 
     class MyWorkflow(xwf_models.Workflow):
@@ -22,7 +23,7 @@ Define a workflow and add it to a model::
         )
         initial_state = 'new'
 
-    class MyModel(xwf_models.WorkflowEnabled):
+    class MyModel(xwf_models.WorkflowEnabled, models.Model):
 
         state = xwf_models.StateField(MyWorkflow)
 

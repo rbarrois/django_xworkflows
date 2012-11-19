@@ -37,9 +37,10 @@ Define a workflow::
 
 And add it to a model::
 
+    from django import models
     from django_xworkflows import models as xwf_models
 
-    class MyModel(xwf_models.WorkflowEnabled):
+    class MyModel(xwf_models.WorkflowEnabled, models.Model):
 
         state = xwf_models.StateField(MyWorkflow)
 
