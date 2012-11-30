@@ -1,6 +1,14 @@
 ChangeLog
 =========
 
+0.8.1 (30/11/2012)
+------------------
+
+*Bugfix:*
+
+    * #7: allow more than one :class:`~django_xworkflows.models.GenericTransitionLog` in the same project.
+
+
 0.8.0 (12/10/2012)
 ------------------
 
