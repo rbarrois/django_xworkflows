@@ -406,7 +406,6 @@ class GenericTransitionLog(BaseTransitionLog):
 
     content_type = models.ForeignKey(ct_models.ContentType,
                                      verbose_name=_(u"Content type"),
-                                     related_name="workflow_object",
                                      blank=True, null=True)
     content_id = models.PositiveIntegerField(_(u"Content id"),
         blank=True, null=True, db_index=True)

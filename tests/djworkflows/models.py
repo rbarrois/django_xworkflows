@@ -109,3 +109,7 @@ class GenericWorkflow(dxmodels.Workflow):
 
 class GenericWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
     state = dxmodels.StateField(GenericWorkflow)
+
+
+class GenericWorkflowTransitionLog(dxmodels.GenericTransitionLog):
+    """This model ensures different GenericTransitionLog may exist together."""
