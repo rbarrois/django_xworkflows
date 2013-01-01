@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2011-2012 Raphaël Barrois
+# Copyright (c) 2011-2013 Raphaël Barrois
+# This code is distributed under the two-clause BSD license.
 
 
 import os
@@ -24,7 +25,7 @@ setup(
     name="django-xworkflows",
     version=get_version(),
     author="Raphaël Barrois",
-    author_email="raphael.barrois@polyconseil.fr",
+    author_email="raphael.barrois+xworkflows@polytechnique.org",
     description=("A django app enabling Django models to use xworkflows."),
     license="BSD",
     keywords="django workflow state machine automaton",

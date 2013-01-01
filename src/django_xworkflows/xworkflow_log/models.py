@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2011-2012 Raphaël Barrois
+# Copyright (c) 2011-2013 Raphaël Barrois
+# This code is distributed under the two-clause BSD license.
 
 from django.conf import settings
 from django.db import models as django_models
