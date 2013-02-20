@@ -253,7 +253,15 @@ def get_default_log_model():
         return ''
 
 
-class TransactionalImplementationWrapper(base.ImplementationWrapper):
+class DjangoImplementationWrapper(base.ImplementationWrapper):
+    """Restrict execution of transitions within templates"""
+    # django < 1.4
+    alters_data = True
+    # django >= 1.4
+    do_not_call_in_templates = True
+
+
+class TransactionalImplementationWrapper(DjangoImplementationWrapper):
     """Customize the base ImplementationWrapper to run into a db transaction."""
 
     def __call__(self, *args, **kwargs):
@@ -270,6 +278,7 @@ class Workflow(base.Workflow):
         log_model_class (obj): the class for the log model; resolved once django
             is completely loaded.
     """
+    implementation_class = DjangoImplementationWrapper
 
     #: Save log to this django model (name of the model)
     log_model = get_default_log_model()
