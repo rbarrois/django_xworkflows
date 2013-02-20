@@ -253,7 +253,14 @@ def get_default_log_model():
         return ''
 
 
-class TransactionalImplementationWrapper(base.ImplementationWrapper):
+class DjangoImplementationWrapper(base.ImplementationWrapper):
+    """Adds the alters_data attribute to the base ImplementationWrapper to refuse
+    calls of transitions within a template
+    """
+    alters_data = True
+
+
+class TransactionalImplementationWrapper(DjangoImplementationWrapper):
     """Customize the base ImplementationWrapper to run into a db transaction."""
 
     def __call__(self, *args, **kwargs):
@@ -270,6 +277,7 @@ class Workflow(base.Workflow):
         log_model_class (obj): the class for the log model; resolved once django
             is completely loaded.
     """
+    implementation_class = DjangoImplementationWrapper
 
     #: Save log to this django model (name of the model)
     log_model = get_default_log_model()
