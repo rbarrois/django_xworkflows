@@ -7,6 +7,7 @@ from django.core import exceptions
 from django.core import serializers
 from django.db import models as django_models
 from django import test
+from django.template import Template, Context
 from django.utils import unittest
 
 import xworkflows
@@ -364,3 +365,44 @@ class SouthTestCase(test.TestCase):
 
         self.assertEqual(models.MyWorkflow.initial_state.name,
             frozen_field.workflow.initial_state.name)
+
+
+class TemplateTestCase(test.TestCase):
+    """Tests states and transitions behavior in templates."""
+
+    def setUp(self):
+        self.obj = models.MyWorkflowEnabled()
+
+    def test_states(self):
+        obj = self.obj
+        true , false = unicode(True), unicode(False)
+        context = Context({'obj':obj, 'true': true, 'false': false})
+        render = lambda x: Template(x).render(context)
+
+        self.assertEqual(render("{{obj.state}}"), obj.state.state.title)
+
+        self.assertEqual(render("{{ obj.state.is_foo }}"), true)
+        self.assertEqual(render("{% if obj.state == 'foo' %}{{ true }}{% else %}{{ false }}{% endif %}"), true)
+
+        self.assertEqual(render("{{ obj.state.is_bar }}"), false)
+        self.assertEqual(render("{% if obj.state == 'bar' %}{{ true }}{% else %}{{ false }}{% endif %}"), false)
+
+        self.assertTrue(obj.foobar.alters_data)
+        self.assertTrue(obj.foobar.do_not_call_in_templates)
+
+        if django_version[:2] < (1,4):
+            # testing django 1.3
+            self.assertEqual(render("{{ obj.foobar}}"), "")
+            self.assertEqual(render("{{ obj.foobar.is_available }}"), "")
+
+            self.assertEqual(render("{{ obj.bazbar|safe}}"), "")
+            self.assertEqual(render("{{ obj.bazbar.is_available }}"), "")
+        else:
+            # testing django > 1.4
+            self.assertEqual(render("{{ obj.foobar|safe}}"), unicode(obj.foobar))
+            self.assertEqual(render("{{ obj.foobar.is_available }}"), true)
+
+            self.assertEqual(render("{{ obj.bazbar|safe}}"), unicode(obj.bazbar))
+            self.assertEqual(render("{{ obj.bazbar.is_available }}"), false)
+
+        self.assertTrue(obj.state.is_foo)
