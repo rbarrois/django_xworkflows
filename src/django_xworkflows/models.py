@@ -254,10 +254,11 @@ def get_default_log_model():
 
 
 class DjangoImplementationWrapper(base.ImplementationWrapper):
-    """Adds the alters_data attribute to the base ImplementationWrapper to refuse
-    calls of transitions within a template
-    """
+    """Restrict execution of transitions within templates"""
+    # django < 1.4
     alters_data = True
+    # django >= 1.4
+    do_not_call_in_templates = True
 
 
 class TransactionalImplementationWrapper(DjangoImplementationWrapper):
