@@ -58,7 +58,7 @@ class Command(BaseCommand):
     def cluster_counter(self):
         if not hasattr(self, '_cluster_counter'):
             self._cluster_counter = 1
-        else:]
+        else:
             self._cluster_counter += 1
         return self._cluster_counter
 
