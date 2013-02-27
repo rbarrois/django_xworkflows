@@ -401,18 +401,18 @@ class TemplateTestCase(test.TestCase):
 
         self.assertEqual(self.render_fragment("{{ obj.foobar}}"), "")
         self.assertEqual(self.render_fragment("{{ obj.foobar.is_available }}"), "")
-        self.assertEqual(models.MyWorkflow.states.foo, self.obj.foo)
+        self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
 
         self.assertEqual(self.render_fragment("{{ obj.bazbar|safe}}"), "")
         self.assertEqual(self.render_fragment("{{ obj.bazbar.is_available }}"), "")
-        self.assertEqual(models.MyWorkflow.states.foo, self.obj.foo)
+        self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
 
     @unittest.skipIf(django_version[:2] < (1, 4), "foo.do_not_call_in_templates requires django>=1.4")
     def test_transaction_attributes(self):
         self.assertEqual(self.render_fragment("{{ obj.foobar|safe}}"), unicode(self.obj.foobar))
         self.assertEqual(self.render_fragment("{{ obj.foobar.is_available }}"), self.uTrue)
+        self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
 
         self.assertEqual(self.render_fragment("{{ obj.bazbar|safe}}"), unicode(self.obj.bazbar))
         self.assertEqual(self.render_fragment("{{ obj.bazbar.is_available }}"), self.uFalse)
-
-        self.assertTrue(self.obj.state.is_foo)
+        self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
