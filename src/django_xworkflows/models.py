@@ -278,6 +278,7 @@ class Workflow(base.Workflow):
         log_model_class (obj): the class for the log model; resolved once django
             is completely loaded.
     """
+    #: Behave properly in Django templates
     implementation_class = DjangoImplementationWrapper
 
     #: Save log to this django model (name of the model)

@@ -6,6 +6,7 @@ from django import VERSION as django_version
 from django.core import exceptions
 from django.core import serializers
 from django.db import models as django_models
+from django import template
 from django import test
 from django.template import Template, Context
 from django.utils import unittest
@@ -370,39 +371,48 @@ class SouthTestCase(test.TestCase):
 class TemplateTestCase(test.TestCase):
     """Tests states and transitions behavior in templates."""
 
+    uTrue = unicode(True)
+    uFalse = unicode(False)
+
     def setUp(self):
         self.obj = models.MyWorkflowEnabled()
+        self.context = template.Context({'obj': self.obj, 'true': self.uTrue, 'false': self.uFalse})
 
-    def test_states(self):
-        obj = self.obj
-        true , false = unicode(True), unicode(False)
-        context = Context({'obj':obj, 'true': true, 'false': false})
-        render = lambda x: Template(x).render(context)
+    def render_fragment(self, fragment):
+        return template.Template(fragment).render(self.context)
 
-        self.assertEqual(render("{{obj.state}}"), obj.state.state.title)
+    def test_state(self):
+        self.assertEqual(self.render_fragment("{{obj.state}}"), self.obj.state.state.title)
 
-        self.assertEqual(render("{{ obj.state.is_foo }}"), true)
-        self.assertEqual(render("{% if obj.state == 'foo' %}{{ true }}{% else %}{{ false }}{% endif %}"), true)
+        self.assertEqual(self.render_fragment("{{ obj.state.is_foo }}"), self.uTrue)
+        self.assertEqual(self.render_fragment("{% if obj.state == 'foo' %}{{ true }}{% else %}{{ false }}{% endif %}"), self.uTrue)
 
-        self.assertEqual(render("{{ obj.state.is_bar }}"), false)
-        self.assertEqual(render("{% if obj.state == 'bar' %}{{ true }}{% else %}{{ false }}{% endif %}"), false)
+        self.assertEqual(self.render_fragment("{{ obj.state.is_bar }}"), self.uFalse)
+        self.assertEqual(self.render_fragment("{% if obj.state == 'bar' %}{{ true }}{% else %}{{ false }}{% endif %}"), self.uFalse)
 
-        self.assertTrue(obj.foobar.alters_data)
-        self.assertTrue(obj.foobar.do_not_call_in_templates)
+    def test_django_magic(self):
+        """Ensure that ImplementationWrappers have magic django attributes."""
+        self.assertTrue(self.obj.foobar.alters_data)
+        self.assertTrue(self.obj.foobar.do_not_call_in_templates)
 
-        if django_version[:2] < (1,4):
-            # testing django 1.3
-            self.assertEqual(render("{{ obj.foobar}}"), "")
-            self.assertEqual(render("{{ obj.foobar.is_available }}"), "")
+    @unittest.skipIf(django_version[:2] >= (1, 4), "foo.do_not_call_in_templates implemented since django>=1.4")
+    def test_transition_hidden(self):
+        """Tests that django (<1.4) will prevent calling the template."""
 
-            self.assertEqual(render("{{ obj.bazbar|safe}}"), "")
-            self.assertEqual(render("{{ obj.bazbar.is_available }}"), "")
-        else:
-            # testing django > 1.4
-            self.assertEqual(render("{{ obj.foobar|safe}}"), unicode(obj.foobar))
-            self.assertEqual(render("{{ obj.foobar.is_available }}"), true)
+        self.assertEqual(self.render_fragment("{{ obj.foobar}}"), "")
+        self.assertEqual(self.render_fragment("{{ obj.foobar.is_available }}"), "")
+        self.assertEqual(models.MyWorkflow.states.foo, self.obj.foo)
 
-            self.assertEqual(render("{{ obj.bazbar|safe}}"), unicode(obj.bazbar))
-            self.assertEqual(render("{{ obj.bazbar.is_available }}"), false)
+        self.assertEqual(self.render_fragment("{{ obj.bazbar|safe}}"), "")
+        self.assertEqual(self.render_fragment("{{ obj.bazbar.is_available }}"), "")
+        self.assertEqual(models.MyWorkflow.states.foo, self.obj.foo)
 
-        self.assertTrue(obj.state.is_foo)
+    @unittest.skipIf(django_version[:2] < (1, 4), "foo.do_not_call_in_templates requires django>=1.4")
+    def test_transaction_attributes(self):
+        self.assertEqual(self.render_fragment("{{ obj.foobar|safe}}"), unicode(self.obj.foobar))
+        self.assertEqual(self.render_fragment("{{ obj.foobar.is_available }}"), self.uTrue)
+
+        self.assertEqual(self.render_fragment("{{ obj.bazbar|safe}}"), unicode(self.obj.bazbar))
+        self.assertEqual(self.render_fragment("{{ obj.bazbar.is_available }}"), self.uFalse)
+
+        self.assertTrue(self.obj.state.is_foo)

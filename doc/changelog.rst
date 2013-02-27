@@ -1,6 +1,15 @@
 ChangeLog
 =========
 
+0.9.0 (current)
+---------------
+
+*New:*
+
+    * #10: Ask Django' templates to not call transitions, and give access to sub-methods
+      (e.g :meth:`~xworkflows.base.ImplementationWrapper.is_available`).
+      Contributed by `kanu <https://github.com/kanu>`_.
+
 0.8.1 (30/11/2012)
 ------------------
 
@@ -108,6 +117,5 @@ ChangeLog
     * Introduce :class:`~django_xworkflows.models.StateField` for adding a :class:`~django_xworkflows.models.Workflow`
       to a model
     * Adapt to xworkflows-0.3.0
-
 
 .. vim:et:ts=4:sw=4:tw=79:ft=rst:

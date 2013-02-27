@@ -76,7 +76,38 @@ Transitions
 
 Transitions mostly follow XWorkflows' mechanism.
 
-.. class:: TransactionalImplementationWrapper(xworkflows.base.ImplementationWrapper)
+Implementation wrappers
+-----------------------
+
+django_xworkflows provides two custom implementation wrappers specially suited for Django:
+
+.. class:: DjangoImplementationWrapper(xworkflows.base.ImplementationWrapper)
+
+    This wrapper simply adds two special attributes for interpretation in Django templates:
+
+    .. attribute:: alters_data
+
+        Set to ``True`` to prevent Django templating system to call a transition, e.g in
+        ``{{ foo.confirm }}``
+
+    .. attribute:: do_not_call_in_templates
+
+        This attribute signals Django templating system (starting from Django 1.4)
+        that the transition implementation should not be called, but its attributes
+        should be made available.
+
+        This allows such constructs:
+
+        .. code-block:: html
+
+            {% if obj.confirm.is_available %}
+            <form method="POST" action="">
+                <input type="submit" value="Confirm" />
+            </form>
+            {% endif %}
+
+
+.. class:: TransactionalImplementationWrapper(DjangoImplementationWrapper)
 
     This specific wrapper runs all transition-related code, including :class:`hooks <xworkflows.base.Hook>`,
     in a single database transaction.
@@ -89,6 +120,9 @@ of a :class:`Workflow`::
     class MyWorkflow(models.Workflow):
         implementation_class = models.TransactionalImplementationWrapper
 
+
+Workflow and logging
+--------------------
 
 .. class:: Workflow(xworkflows.Workflow)
 
@@ -142,8 +176,8 @@ of a :class:`Workflow`::
           transition in the database.
 
 
-Transition logs
-===============
+Transition database logging
+===========================
 
 Transition logs can be stored in the database. This is performed by the :meth:`~Workflow.db_log` method of the :class:`Workflow` class.
 
