@@ -381,9 +381,15 @@ class TemplateTestCase(test.TestCase):
     def render_fragment(self, fragment):
         return template.Template(fragment).render(self.context)
 
-    def test_state(self):
+    @unittest.skipIf(int(xworkflows.__version__.split('.')[0]) >= 1, "Behaviour changed in xworkflows-1.0.0")
+    def test_state_display_is_title(self):
         self.assertEqual(self.render_fragment("{{obj.state}}"), self.obj.state.state.title)
 
+    @unittest.skipIf(int(xworkflows.__version__.split('.')[0]) < 1, "Behaviour changed in xworkflows-1.0.0")
+    def test_state_display_is_name(self):
+        self.assertEqual(self.render_fragment("{{obj.state}}"), self.obj.state.state.name)
+
+    def test_state(self):
         self.assertEqual(self.render_fragment("{{ obj.state.is_foo }}"), self.uTrue)
         self.assertEqual(self.render_fragment("{% if obj.state == 'foo' %}{{ true }}{% else %}{{ false }}{% endif %}"), self.uTrue)
 
