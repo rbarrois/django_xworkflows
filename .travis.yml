@@ -10,6 +10,7 @@ script: "python setup.py test"
 install:
   - if [[ $TRAVIS_PYTHON_VERSION = 2.6 ]]; then pip install unittest2 --use-mirrors; fi
   - pip install Django==$DJANGO_VERSION --quiet --use-mirrors
+  - pip install xworkflows --quiet --use-mirrors
   - python setup.py --quiet install
 notifications:
   email: false
