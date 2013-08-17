@@ -14,7 +14,6 @@ from django.contrib.contenttypes import models as ct_models
 from django.core import exceptions
 from django.forms import fields
 from django.forms import widgets
-from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 
 try:
@@ -25,6 +24,11 @@ except ImportError:
     import datetime
     now = datetime.datetime.now
     del datetime
+
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.encoding import force_unicode as force_text
 
 from xworkflows import base
 
@@ -242,7 +246,7 @@ class WorkflowEnabled(base.BaseWorkflowEnabled):
     def _get_FIELD_display(self, field):
         if isinstance(field, StateField):
             value = getattr(self, field.attname)
-            return force_unicode(value.title)
+            return force_text(value.title)
         else:
             return super(WorkflowEnabled, self)._get_FIELD_display(field)
 

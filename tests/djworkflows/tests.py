@@ -22,6 +22,7 @@ from django_xworkflows.xworkflow_log import models as xwlog_models
 
 try:
     import south
+    import south.orm
     import south.creator.freezer
     import south.modelsinspector
 except ImportError:
