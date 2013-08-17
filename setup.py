@@ -6,6 +6,7 @@
 
 import os
 import re
+import sys
 
 from setuptools import setup
 
@@ -27,6 +28,12 @@ def get_version(package_name):
 def parse_requirements(requirements_file):
     with open(requirements_file, 'r') as f:
         return [line for line in f if line.strip() and not line.startswith('#')]
+
+
+if sys.version_info[0:2] < (2, 7):
+    extra_tests_require = ['unittest2']
+else:
+    extra_tests_require = []
 
 
 PACKAGE = 'django_xworkflows'
@@ -54,7 +61,7 @@ setup(
         'setuptools>=0.8',
     ],
     install_requires=parse_requirements(REQUIREMENTS_PATH),
-    tests_require=['unittest2'],
+    tests_require=[] + extra_tests_require,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
