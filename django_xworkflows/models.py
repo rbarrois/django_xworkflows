@@ -16,21 +16,9 @@ from django.forms import fields
 from django.forms import widgets
 from django.utils.translation import ugettext_lazy as _
 
-try:
-    from django.utils import timezone
-    now = timezone.now
-    del timezone
-except ImportError:
-    import datetime
-    now = datetime.datetime.now
-    del datetime
-
-try:
-    from django.utils.encoding import force_text
-except ImportError:
-    from django.utils.encoding import force_unicode as force_text
-
 from xworkflows import base
+
+from .compat import force_text, now, python_2_unicode_compatible
 
 
 State = base.State
@@ -217,7 +205,7 @@ class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
         use our custom StateField objects.
         """
         workflows = {}
-        for k, v in attrs.iteritems():
+        for k, v in attrs.items():
             if isinstance(v, StateField):
                 workflows[k] = v
         return workflows
@@ -239,16 +227,30 @@ class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
         pass
 
 
-class WorkflowEnabled(base.BaseWorkflowEnabled):
+class BaseWorkflowEnabled(base.BaseWorkflowEnabled):
     """Base class for all django models wishing to use a Workflow."""
-    __metaclass__ = WorkflowEnabledMeta
 
     def _get_FIELD_display(self, field):
         if isinstance(field, StateField):
             value = getattr(self, field.attname)
             return force_text(value.title)
         else:
-            return super(WorkflowEnabled, self)._get_FIELD_display(field)
+            return super(BaseWorkflowEnabled, self)._get_FIELD_display(field)
+
+
+# Workaround for metaclasses on python2/3.
+# Equivalent to:
+# Python2
+#
+# class WorkflowEnabled(BaseWorkflowEnabled):
+#     __metaclass__ = WorkflowEnabledMeta
+#
+# Python3
+#
+# class WorkflowEnabled(metaclass=WorkflowEnabledMeta):
+#     pass
+
+WorkflowEnabled = WorkflowEnabledMeta(str('WorkflowEnabled'), (BaseWorkflowEnabled,), {})
 
 
 def get_default_log_model():
@@ -346,6 +348,7 @@ class Workflow(base.Workflow):
             self.db_log(transition, from_state, instance, *args, **kwargs)
 
 
+@python_2_unicode_compatible
 class BaseTransitionLog(models.Model):
     """Abstract model for a minimal database logging setup.
 
@@ -401,7 +404,7 @@ class BaseTransitionLog(models.Model):
         })
         return cls.objects.create(**kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%r: %s -> %s at %s' % (self.get_modified_object(),
             self.from_state, self.to_state, self.timestamp.isoformat())
 

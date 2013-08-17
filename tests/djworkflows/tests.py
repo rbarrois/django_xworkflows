@@ -28,6 +28,13 @@ try:
 except ImportError:
     south = None
 
+if sys.version_info[0] <= 2:
+    def text_type(text):
+        return unicode(text)
+else:
+    def text_type(text):
+        return str(text)
+
 from . import models
 
 
@@ -217,7 +224,7 @@ class TransitionTestCase(test.TransactionTestCase):
         self.assertEqual('foo', trlog.from_state)
         self.assertEqual('bar', trlog.to_state)
 
-        self.assertIn('foo -> bar', unicode(trlog))
+        self.assertIn('foo -> bar', text_type(trlog))
 
     def test_no_logging(self):
         """Tests disabled transition logs."""
@@ -376,8 +383,8 @@ class SouthTestCase(test.TestCase):
 class TemplateTestCase(test.TestCase):
     """Tests states and transitions behavior in templates."""
 
-    uTrue = unicode(True)
-    uFalse = unicode(False)
+    uTrue = text_type(True)
+    uFalse = text_type(False)
 
     def setUp(self):
         self.obj = models.MyWorkflowEnabled()
@@ -420,10 +427,10 @@ class TemplateTestCase(test.TestCase):
 
     @unittest.skipIf(django_version[:2] < (1, 4), "foo.do_not_call_in_templates requires django>=1.4")
     def test_transaction_attributes(self):
-        self.assertEqual(self.render_fragment("{{ obj.foobar|safe}}"), unicode(self.obj.foobar))
+        self.assertEqual(self.render_fragment("{{ obj.foobar|safe}}"), text_type(self.obj.foobar))
         self.assertEqual(self.render_fragment("{{ obj.foobar.is_available }}"), self.uTrue)
         self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
 
-        self.assertEqual(self.render_fragment("{{ obj.bazbar|safe}}"), unicode(self.obj.bazbar))
+        self.assertEqual(self.render_fragment("{{ obj.bazbar|safe}}"), text_type(self.obj.bazbar))
         self.assertEqual(self.render_fragment("{{ obj.bazbar.is_available }}"), self.uFalse)
         self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
