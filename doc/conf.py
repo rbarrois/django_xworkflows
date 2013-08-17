@@ -11,6 +11,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+from __future__ import unicode_literals
+
 import sys, os
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -40,8 +42,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'django-xworkflows'
-copyright = u'2011-2013, Raphaël Barrois'
+project = 'django-xworkflows'
+copyright = '2011-2013, Raphaël Barrois'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -192,8 +194,8 @@ htmlhelp_basename = 'django-xworkflowsdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'django-xworkflows.tex', u'django-xworkflows Documentation',
-   u'Raphaël Barrois', 'manual'),
+  ('index', 'django-xworkflows.tex', 'django-xworkflows Documentation',
+   'Raphaël Barrois', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -225,6 +227,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'django-xworkflows', u'django-xworkflows Documentation',
-     [u'Raphaël Barrois'], 1)
+    ('index', 'django-xworkflows', 'django-xworkflows Documentation',
+     ['Raphaël Barrois'], 1)
 ]

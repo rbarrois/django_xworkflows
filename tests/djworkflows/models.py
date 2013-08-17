@@ -2,6 +2,8 @@
 # Copyright (c) 2011-2013 Raphaël Barrois
 # This code is distributed under the two-clause BSD license.
 
+from __future__ import unicode_literals
+
 from django.db import models
 import xworkflows
 
@@ -9,9 +11,9 @@ from django_xworkflows import models as dxmodels
 
 class MyWorkflow(dxmodels.Workflow):
     states = (
-        ('foo', u"Foo"),
-        ('bar', u"Bar"),
-        ('baz', u"Baz"),
+        ('foo', "Foo"),
+        ('bar', "Bar"),
+        ('baz', "Baz"),
     )
     transitions = (
         ('foobar', 'foo', 'bar'),
@@ -28,7 +30,7 @@ class MyAltWorkflow(dxmodels.Workflow):
         ('a', 'StateA'),
         ('b', 'StateB'),
         ('c', 'StateC'),
-        ('something_very_long', u"A very long name"),
+        ('something_very_long', "A very long name"),
     )
     transitions = (
         ('tob', ('a', 'c'), 'b'),
@@ -42,8 +44,8 @@ class MyAltWorkflow(dxmodels.Workflow):
 
 class MyWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
     OTHER_CHOICES = (
-        ('aaa', u"AAA"),
-        ('bbb', u"BBB"),
+        ('aaa', "AAA"),
+        ('bbb', "BBB"),
     )
 
     state = dxmodels.StateField(MyWorkflow)

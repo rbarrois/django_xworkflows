@@ -2,6 +2,8 @@
 # Copyright (c) 2011-2013 Raphaël Barrois
 # This code is distributed under the two-clause BSD license.
 
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.db import models as django_models
 from django.utils.translation import ugettext_lazy as _
@@ -30,4 +32,4 @@ class TransitionLog(models.GenericTransitionLog):
 
     user = django_models.ForeignKey(
         getattr(settings, 'XWORKFLOWS_USER_MODEL', 'auth.User'),
-        blank=True, null=True, verbose_name=_(u"author"))
+        blank=True, null=True, verbose_name=_("author"))

@@ -2,6 +2,8 @@
 # Copyright (c) 2011-2013 Raphaël Barrois
 # This code is distributed under the two-clause BSD license.
 
+from __future__ import unicode_literals
+
 
 """Rebuild missing from_state/to_state fields on TransitionLog objects."""
 
@@ -50,7 +52,7 @@ class Command(base.LabelCommand):
                 try:
                     transition = workflow.transitions[log.transition]
                 except KeyError:
-                    self.stderr.write(u"Unknown transition %s in log %d for %s %d\n" % (log.transition, log.pk, label, pk))
+                    self.stderr.write("Unknown transition %s in log %d for %s %d\n" % (log.transition, log.pk, label, pk))
                     continue
 
                 updated = False

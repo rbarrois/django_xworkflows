@@ -2,6 +2,10 @@
 # Copyright (c) 2011-2013 Raphaël Barrois
 # This code is distributed under the two-clause BSD license.
 
+from __future__ import unicode_literals
+
+import sys
+
 from django import VERSION as django_version
 from django.core import exceptions
 from django.core import serializers
@@ -93,8 +97,8 @@ class ModelTestCase(test.TestCase):
 
     def test_display(self):
         o = models.MyWorkflowEnabled(other='aaa')
-        self.assertEqual(u"Foo", o.get_state_display())
-        self.assertEqual(u"AAA", o.get_other_display())
+        self.assertEqual("Foo", o.get_state_display())
+        self.assertEqual("AAA", o.get_other_display())
 
     def test_queries(self):
         models.MyWorkflowEnabled.objects.all().delete()
@@ -323,8 +327,8 @@ class SouthTestCase(test.TestCase):
 
     frozen_workflow = (
         "__import__('xworkflows', globals(), locals()).base.WorkflowMeta("
-        "'MyWorkflow', (), {'states': (('foo', u'Foo'), ('bar', u'Bar'), "
-        "('baz', u'Baz')), 'initial_state': 'foo'})")
+        "'MyWorkflow', (), {'states': (('foo', 'foo'), ('bar', 'bar'), "
+        "('baz', 'baz')), 'initial_state': 'foo'})")
 
     def test_south_triple(self):
         field = models.MyWorkflowEnabled._meta.get_field_by_name('state')[0]
@@ -335,7 +339,7 @@ class SouthTestCase(test.TestCase):
                 'django_xworkflows.models.StateField',  # Class
                 [],  # *args
                 {
-                    'default': "'foo'",
+                    'default': "'foo'" if sys.version_info[0] >= 3 else "u'foo'",
                     'max_length': '16',
                     'workflow': self.frozen_workflow},  # **kwargs
             ), triple)

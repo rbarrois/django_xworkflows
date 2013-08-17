@@ -2,6 +2,8 @@
 # Copyright (c) 2011-2013 Raphaël Barrois
 # This code is distributed under the two-clause BSD license.
 
+from __future__ import unicode_literals
+
 """Specific versions of XWorkflows to use with Django."""
 
 from django.db import models
@@ -81,12 +83,12 @@ class StateField(models.Field):
     """Holds the current state of a WorkflowEnabled object."""
 
     default_error_messages = {
-        'invalid': _(u"Choose a valid state."),
-        'wrong_type': _(u"Please enter a valid value (got %r)."),
-        'wrong_workflow': _(u"Please enter a value from the right workflow (got %r)."),
-        'invalid_state': _(u"%s is not a valid state."),
+        'invalid': _("Choose a valid state."),
+        'wrong_type': _("Please enter a valid value (got %r)."),
+        'wrong_workflow': _("Please enter a value from the right workflow (got %r)."),
+        'invalid_state': _("%s is not a valid state."),
     }
-    description = _(u"State")
+    description = _("State")
 
     DEFAULT_MAX_LENGTH = 16
 
@@ -184,14 +186,14 @@ class StateField(models.Field):
         args, kwargs = introspector(self)
 
         state_def = tuple(
-            (str(st.name), unicode(st.title)) for st in self.workflow.states)
-        initial_state_def = self.workflow.initial_state.name
+            (str(st.name), str(st.name)) for st in self.workflow.states)
+        initial_state_def = str(self.workflow.initial_state.name)
 
         workflow = (
             "__import__('xworkflows', globals(), locals()).base.WorkflowMeta("
             "'%(class_name)s', (), "
             "{'states': %(states)r, 'initial_state': %(initial_state)r})" % {
-                'class_name': self.workflow.__class__.__name__,
+                'class_name': str(self.workflow.__class__.__name__),
                 'states': state_def,
                 'initial_state': initial_state_def,
             })
@@ -365,19 +367,19 @@ class BaseTransitionLog(models.Model):
     MODIFIED_OBJECT_FIELD = ''
     EXTRA_LOG_ATTRIBUTES = ()
 
-    transition = models.CharField(_(u"transition"), max_length=255,
+    transition = models.CharField(_("transition"), max_length=255,
         db_index=True)
-    from_state = models.CharField(_(u"from state"), max_length=255,
+    from_state = models.CharField(_("from state"), max_length=255,
         db_index=True)
-    to_state = models.CharField(_(u"to state"), max_length=255,
+    to_state = models.CharField(_("to state"), max_length=255,
         db_index=True)
-    timestamp = models.DateTimeField(_(u"performed at"),
+    timestamp = models.DateTimeField(_("performed at"),
         default=now, db_index=True)
 
     class Meta:
         ordering = ('-timestamp', 'transition')
-        verbose_name = _(u'XWorkflow transition log')
-        verbose_name_plural = _(u'XWorkflow transition logs')
+        verbose_name = _('XWorkflow transition log')
+        verbose_name_plural = _('XWorkflow transition logs')
         abstract = True
 
     def get_modified_object(self):
@@ -396,7 +398,7 @@ class BaseTransitionLog(models.Model):
         return cls.objects.create(**kwargs)
 
     def __unicode__(self):
-        return u'%r: %s -> %s at %s' % (self.get_modified_object(),
+        return '%r: %s -> %s at %s' % (self.get_modified_object(),
             self.from_state, self.to_state, self.timestamp.isoformat())
 
 
@@ -416,9 +418,9 @@ class GenericTransitionLog(BaseTransitionLog):
     MODIFIED_OBJECT_FIELD = 'modified_object'
 
     content_type = models.ForeignKey(ct_models.ContentType,
-                                     verbose_name=_(u"Content type"),
+                                     verbose_name=_("Content type"),
                                      blank=True, null=True)
-    content_id = models.PositiveIntegerField(_(u"Content id"),
+    content_id = models.PositiveIntegerField(_("Content id"),
         blank=True, null=True, db_index=True)
     modified_object = generic.GenericForeignKey(
             ct_field="content_type",
@@ -426,8 +428,8 @@ class GenericTransitionLog(BaseTransitionLog):
 
     class Meta:
         ordering = ('-timestamp', 'transition')
-        verbose_name = _(u'XWorkflow transition log')
-        verbose_name_plural = _(u'XWorkflow transition logs')
+        verbose_name = _('XWorkflow transition log')
+        verbose_name_plural = _('XWorkflow transition logs')
         abstract = True
 
 
@@ -435,8 +437,8 @@ class BaseLastTransitionLog(BaseTransitionLog):
     """Alternate abstract model holding only the latest transition."""
 
     class Meta:
-        verbose_name = _(u'XWorkflow last transition log')
-        verbose_name_plural = _(u'XWorkflow last transition logs')
+        verbose_name = _('XWorkflow last transition log')
+        verbose_name_plural = _('XWorkflow last transition logs')
         abstract = True
 
     @classmethod
@@ -480,18 +482,18 @@ class GenericLastTransitionLog(BaseLastTransitionLog):
     MODIFIED_OBJECT_FIELD = 'modified_object'
 
     content_type = models.ForeignKey(ct_models.ContentType,
-                                     verbose_name=_(u"Content type"),
+                                     verbose_name=_("Content type"),
                                      related_name='last_transition_logs',
                                      blank=True, null=True)
-    content_id = models.PositiveIntegerField(_(u"Content id"),
+    content_id = models.PositiveIntegerField(_("Content id"),
         blank=True, null=True, db_index=True)
     modified_object = generic.GenericForeignKey(
             ct_field="content_type",
             fk_field="content_id")
 
     class Meta:
-        verbose_name = _(u'XWorkflow last transition log')
-        verbose_name_plural = _(u'XWorkflow last transition logs')
+        verbose_name = _('XWorkflow last transition log')
+        verbose_name_plural = _('XWorkflow last transition logs')
         abstract = True
         unique_together =  ('content_type', 'content_id')
 
