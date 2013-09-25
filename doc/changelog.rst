@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+0.9.2 (2013-09-25)
+------------------
+
+*Bugfix:*
+
+    * Fix migrations to take into account Django's ``AUTH_USER_MODEL`` setting.
+
 0.9.1 (2013-08-14)
 ------------------
 
