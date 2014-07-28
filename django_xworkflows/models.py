@@ -14,6 +14,11 @@ from django.contrib.contenttypes import models as ct_models
 from django.core import exceptions
 from django.forms import fields
 from django.forms import widgets
+try:
+    # Serialization decorator used by the new Django1.7 migrations.
+    from django.utils.deconstruct import deconstructible
+except ImportError:
+    deconstructible = lambda x: x
 from django.utils.translation import ugettext_lazy as _
 
 from xworkflows import base
@@ -98,6 +103,14 @@ class StateField(models.Field):
         kwargs['null'] = False
         kwargs['default'] = self.workflow.initial_state.name
         return super(StateField, self).__init__(**kwargs)
+
+    def deconstruct(self):
+        """Allow Django>=1.7 to serialize this class, needed for migrations."""
+        name, path, args, kwargs = super(StateField, self).deconstruct()
+
+        kwargs['workflow'] = self.workflow
+
+        return name, path, args, kwargs
 
     def get_internal_type(self):
         return "CharField"
@@ -250,7 +263,11 @@ class BaseWorkflowEnabled(base.BaseWorkflowEnabled):
 # class WorkflowEnabled(metaclass=WorkflowEnabledMeta):
 #     pass
 
-WorkflowEnabled = WorkflowEnabledMeta(str('WorkflowEnabled'), (BaseWorkflowEnabled,), {})
+WorkflowEnabled = WorkflowEnabledMeta(
+    str('WorkflowEnabled'),
+    (BaseWorkflowEnabled,),
+    {'__module__': 'django_xworkflows.models'})
+
 
 
 def get_default_log_model():
@@ -277,6 +294,7 @@ class TransactionalImplementationWrapper(DjangoImplementationWrapper):
             return super(TransactionalImplementationWrapper, self).__call__(*args, **kwargs)
 
 
+@deconstructible
 class Workflow(base.Workflow):
     """Extended workflow that handles object saving and logging to the database.
 

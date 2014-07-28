@@ -26,6 +26,15 @@ if not settings.configured:
         ]
     )
 
+
+try:
+    # Needed by the new Django1.7 app-loading feature.
+    from django import setup
+    setup()
+except ImportError:
+    pass
+
+
 from django.test import simple
 
 
