@@ -7,27 +7,32 @@ from __future__ import unicode_literals
 """Compatibility helpers."""
 
 
+import django
 import sys
 
 is_python2 = (sys.version_info[0] == 2)
 
-try:
+dj_major_minor = django.VERSION[:2]
+
+
+# New in 1.4: timezone
+if dj_major_minor >= (1, 4):
     from django.utils import timezone
     now = timezone.now
     del timezone
-except ImportError:
+else:
     import datetime
     now = datetime.datetime.now
     del datetime
 
-try:
+
+# New in 1.5: proper text
+if dj_major_minor >= (1, 5):
     from django.utils.encoding import force_text
-except ImportError:
+    from django.utils.encoding import python_2_unicode_compatible
+else:
     from django.utils.encoding import force_unicode as force_text
 
-try:
-    from django.utils.encoding import python_2_unicode_compatible
-except ImportError:
     def python_2_unicode_compatible(c):
         if not hasattr(c, '__unicode__'):
             c.__unicode__ = c.__str__
