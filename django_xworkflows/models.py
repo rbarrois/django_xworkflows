@@ -18,7 +18,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from xworkflows import base
 
-from .compat import force_text, now, python_2_unicode_compatible
+from .compat import deconstructible, force_text, now, python_2_unicode_compatible
 
 
 State = base.State
@@ -193,6 +193,31 @@ class StateField(models.Field):
 
         return ('django_xworkflows.models.StateField', args, kwargs)
 
+    def deconstruct(self):
+        """Deconstruction for migrations.
+
+        Return a simpler object (_SerializedWorkflow), since our Workflows
+        are rather hard to serialize: Django doesn't like deconstructing
+        metaclass-built classes.
+        """
+        name, path, args, kwargs = super(StateField, self).deconstruct()
+
+        # We want to display the proper class name, which isn't available
+        # at the same point for _SerializedWorkflow and Workflow.
+        if isinstance(self.workflow, _SerializedWorkflow):
+            workflow_class_name = self.workflow._name
+        else:
+            workflow_class_name = self.workflow.__class__.__name__
+
+        kwargs['workflow'] = _SerializedWorkflow(
+            name=workflow_class_name,
+            initial_state=str(self.workflow.initial_state.name),
+            states=[str(st.name) for st in self.workflow.states],
+        )
+        del kwargs['choices']
+        del kwargs['default']
+        return name, path, args, kwargs
+
 
 class WorkflowEnabledMeta(base.WorkflowEnabledMeta, models.base.ModelBase):
     """Metaclass for WorkflowEnabled objects."""
@@ -275,6 +300,50 @@ class TransactionalImplementationWrapper(DjangoImplementationWrapper):
     def __call__(self, *args, **kwargs):
         with transaction.commit_on_success():
             return super(TransactionalImplementationWrapper, self).__call__(*args, **kwargs)
+
+
+@deconstructible
+class _SerializedWorkflow(object):
+    """Serialized workflow for django.db.migrations.
+
+    Wraps an actual Workflow object, but without the metaclass magic.
+
+    This class makes it easy to retrieve a Workflow object from its class name,
+    initial state and list of states; without going through a class declaration.
+    """
+    def __init__(self, name, initial_state, states):
+        self._name = name
+        self._initial_state = initial_state
+        self._states = states
+
+        # Create a new django_xworkflows.models.Workflow subclass,
+        # using the provided fields.
+        workflow_class = base.WorkflowMeta(
+            self._name,
+            (Workflow,),
+            {
+                'states': [(st, st) for st in states],
+                'initial_state': initial_state,
+            },
+        )
+        self._workflow_class = workflow_class
+        self._workflow = workflow_class()
+
+    def __getattr__(self, attr):
+        # Forward calls to the created Workflow object.
+        return getattr(self._workflow, attr)
+
+    def deconstruct(self):
+        """Serialization for migrations; simply return our __init__ arguments."""
+        return (
+            'django_xworkflows.models._SerializedWorkflow',
+            (),
+            {
+                'name': self._name,
+                'initial_state': self._initial_state,
+                'states': self._states,
+            },
+        )
 
 
 class Workflow(base.Workflow):

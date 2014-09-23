@@ -37,3 +37,11 @@ else:
         if not hasattr(c, '__unicode__'):
             c.__unicode__ = c.__str__
         return c
+
+
+# 1.7: Now migrating
+if dj_major_minor >= (1, 7):
+    from django.utils.deconstruct import deconstructible
+else:
+    def deconstructible(cls):
+        return cls
