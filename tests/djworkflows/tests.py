@@ -437,7 +437,7 @@ class ProjectMigrationTests(test.TestCase):
     DEMO_PROJECT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'demo_project')
 
     def setUp(self):
-        self.dirname = tempfile.mkdtemp(prefix='tmp_djxwf')
+        self.dirname = tempfile.mkdtemp(prefix='tmp_djxwf_tests_')
 
     def tearDown(self):
         def log_error(fn, path, excinfo):
@@ -457,8 +457,8 @@ class ProjectMigrationTests(test.TestCase):
         manage_py = os.path.join(self.dirname, 'demo_project', 'manage.py')
         with extra_pythonpath(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))):
             with override_env(DJANGO_SETTINGS_MODULE='demo_project.settings'):
-                subprocess.check_call([manage_py, 'makemigrations'])
-                subprocess.check_call([manage_py, 'migrate'])
+                subprocess.check_call([manage_py, 'makemigrations', '--verbosity=0'])
+                subprocess.check_call([manage_py, 'migrate', '--verbosity=0'])
 
 
 class TemplateTestCase(test.TestCase):
