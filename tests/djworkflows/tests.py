@@ -4,7 +4,12 @@
 
 from __future__ import unicode_literals
 
+import contextlib
+import os
+import shutil
+import subprocess
 import sys
+import tempfile
 
 from django import VERSION as django_version
 from django.core import exceptions
@@ -36,6 +41,36 @@ else:
         return str(text)
 
 from . import models
+
+
+@contextlib.contextmanager
+def extra_pythonpath(pythonpath):
+    old_path = os.environ.get('PYTHONPATH')
+    if old_path is None:
+        new_path = pythonpath
+    else:
+        new_path = '%s:%s' % (pythonpath, old_path)
+    os.environ['PYTHONPATH'] = new_path
+    yield
+    if old_path is None:
+        del os.environ['PYTHONPATH']
+    else:
+        os.environ['PYTHONPATH'] = old_path
+
+@contextlib.contextmanager
+def override_env(**kwargs):
+    old_values = {}
+    for k, v in kwargs.items():
+        old_values[k] = os.environ.get(k)
+        os.environ[k] = v
+    yield
+
+    for k, v in old_values.items():
+        if v is None:
+            del os.environ[k]
+        else:
+            os.environ[k] = v
+
 
 
 class ModelTestCase(test.TestCase):
@@ -330,6 +365,7 @@ class GenericLastTransitionLogTestCase(test.TestCase):
 
 
 @unittest.skipIf(south is None, "Couldn't import south.")
+@unittest.skipIf(django_version[:2] >= (1, 7), "South not compatible with Django>=1.7.")
 class SouthTestCase(test.TestCase):
     """Tests south-related behavior."""
 
@@ -378,6 +414,51 @@ class SouthTestCase(test.TestCase):
 
         self.assertEqual(models.MyWorkflow.initial_state.name,
             frozen_field.workflow.initial_state.name)
+
+
+@unittest.skipIf(django_version[:2] < (1, 7), "Migrations unavailable in Django<1.7")
+class StateFieldMigrationTests(test.TestCase):
+    def test_modelstate(self):
+        from django.db.migrations import state as migrations_state
+        mwe_mstate = migrations_state.ModelState.from_model(models.MyWorkflowEnabled)
+        project_state = migrations_state.ProjectState()
+        project_state.add_model_state(mwe_mstate)
+        apps = project_state.render()
+
+        model = apps.get_model('djworkflows.MyWorkflowEnabled')
+        self.assertEqual(
+            [st.name for st in models.MyWorkflow.states],
+            [st.name for st in model._meta.fields[1].workflow.states],
+        )
+
+
+@unittest.skipIf(django_version[:2] < (1, 7), "Migrations unavailable in Django<1.7")
+class ProjectMigrationTests(test.TestCase):
+    DEMO_PROJECT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'demo_project')
+
+    def setUp(self):
+        self.dirname = tempfile.mkdtemp(prefix='tmp_djxwf')
+
+    def tearDown(self):
+        def log_error(fn, path, excinfo):
+            sys.stderr.write("Error while deleting %r: %r raised %r\n" % (
+                path, fn, excinfo))
+
+        shutil.rmtree(self.dirname, onerror=log_error)
+
+    def setup_django_project(self):
+        shutil.copytree(
+            self.DEMO_PROJECT_PATH,
+            os.path.join(self.dirname, 'demo_project'),
+        )
+
+    def test_makemigrations(self):
+        self.setup_django_project()
+        manage_py = os.path.join(self.dirname, 'demo_project', 'manage.py')
+        with extra_pythonpath(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))):
+            with override_env(DJANGO_SETTINGS_MODULE='demo_project.settings'):
+                subprocess.check_call([manage_py, 'makemigrations'])
+                subprocess.check_call([manage_py, 'migrate'])
 
 
 class TemplateTestCase(test.TestCase):

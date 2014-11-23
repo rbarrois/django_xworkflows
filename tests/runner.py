@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 import os
 import sys
 
+import django
 from django.conf import settings
 
 if not settings.configured:
@@ -23,8 +24,12 @@ if not settings.configured:
             'tests.djworkflows',
             'django_xworkflows',
             'django_xworkflows.xworkflow_log',
-        ]
+        ],
+        MIDDLEWARE_CLASSES=[],
     )
+
+if django.VERSION[:2] >= (1, 7):
+    django.setup()
 
 from django.test import simple
 

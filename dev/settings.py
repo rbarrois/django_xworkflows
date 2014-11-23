@@ -1,5 +1,7 @@
 # Django settings for migration_helper project.
 
+import django
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -93,11 +95,16 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'migration_helper.urls'
 
 INSTALLED_APPS = (
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sites',
-    'south',
     'django_xworkflows.xworkflow_log',
 )
+
+if django.VERSION[:2] < (1, 7):
+    INSTALLED_APPS = INSTALLED_APPS + (
+        'south',
+    )
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

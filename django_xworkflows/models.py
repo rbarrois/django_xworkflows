@@ -275,7 +275,7 @@ class BaseWorkflowEnabled(base.BaseWorkflowEnabled):
 # class WorkflowEnabled(metaclass=WorkflowEnabledMeta):
 #     pass
 
-WorkflowEnabled = WorkflowEnabledMeta(str('WorkflowEnabled'), (BaseWorkflowEnabled,), {})
+WorkflowEnabled = WorkflowEnabledMeta(str('WorkflowEnabled'), (BaseWorkflowEnabled,), {'__module__': __name__})
 
 
 def get_default_log_model():
