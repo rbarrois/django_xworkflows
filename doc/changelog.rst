@@ -1,6 +1,12 @@
 ChangeLog
 =========
 
+0.9.4 (2014-11-24)
+------------------
+
+*Bugfix:*
+
+    * Add support for ``django.db.migrations`` (Django >= 1.7)
 
 0.9.3 (2014-06-04)
 ------------------
