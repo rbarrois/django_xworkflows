@@ -1,2 +1,3 @@
+graphviz==0.4.3
 xworkflows>=0.4.0
 Django>=1.3
