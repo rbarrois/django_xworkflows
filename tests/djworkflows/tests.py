@@ -25,12 +25,15 @@ import xworkflows
 from django_xworkflows import models as xwf_models
 from django_xworkflows.xworkflow_log import models as xwlog_models
 
-try:
-    import south
-    import south.orm
-    import south.creator.freezer
-    import south.modelsinspector
-except ImportError:
+if django_version[:2] < (1, 8):
+    try:
+        import south
+        import south.orm
+        import south.creator.freezer
+        import south.modelsinspector
+    except ImportError:
+        south = None
+else:
     south = None
 
 if sys.version_info[0] <= 2:
