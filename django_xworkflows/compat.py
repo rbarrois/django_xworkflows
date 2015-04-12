@@ -38,6 +38,11 @@ else:
             c.__unicode__ = c.__str__
         return c
 
+# New in 1.6: transaction.atomic()
+if dj_major_minor >= (1, 6):
+    from django.db.transaction import atomic
+else:
+    from django.db.transaction import commit_on_success as atomic
 
 # 1.7: Now migrating
 if dj_major_minor >= (1, 7):

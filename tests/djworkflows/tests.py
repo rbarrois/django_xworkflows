@@ -422,8 +422,15 @@ class StateFieldMigrationTests(test.TestCase):
         from django.db.migrations import state as migrations_state
         mwe_mstate = migrations_state.ModelState.from_model(models.MyWorkflowEnabled)
         project_state = migrations_state.ProjectState()
-        project_state.add_model_state(mwe_mstate)
-        apps = project_state.render()
+
+        if django_version[:2] < (1, 8):
+            # The method changed between 1.7 and 1.8
+            project_state.add_model_state(mwe_mstate)
+            apps = project_state.render()
+        else:
+            project_state.add_model(mwe_mstate)
+            apps = project_state.apps
+
 
         model = apps.get_model('djworkflows.MyWorkflowEnabled')
         self.assertEqual(

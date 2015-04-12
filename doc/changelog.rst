@@ -1,6 +1,14 @@
 ChangeLog
 =========
 
+
+0.10.0 (current)
+----------------
+
+*New:*
+
+    * Add compatibility for Django >= 1.8
+
 0.9.4 (2014-11-24)
 ------------------
 

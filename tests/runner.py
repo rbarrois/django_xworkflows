@@ -31,13 +31,18 @@ if not settings.configured:
 if django.VERSION[:2] >= (1, 7):
     django.setup()
 
-from django.test import simple
+if django.VERSION[:2] < (1, 8):
+    from django.test.simple import DjangoTestSuiteRunner
+    default_test_args = 'djworkflows'
+else:
+    from django.test.runner import DiscoverRunner as DjangoTestSuiteRunner
+    default_test_args = 'tests.djworkflows'
 
 
 def runtests(*test_args):
     if not test_args:
-        test_args = ('djworkflows',)
-    runner = simple.DjangoTestSuiteRunner(failfast=False)
+        test_args = [default_test_args]
+    runner = DjangoTestSuiteRunner(failfast=False)
     failures = runner.run_tests(test_args)
     sys.exit(failures)
 

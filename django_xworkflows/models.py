@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 """Specific versions of XWorkflows to use with Django."""
 
 from django.db import models
-from django.db import transaction
 from django.conf import settings
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes import models as ct_models
@@ -18,7 +17,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from xworkflows import base
 
-from .compat import deconstructible, force_text, now, python_2_unicode_compatible
+from .compat import atomic, deconstructible, force_text, now, python_2_unicode_compatible
 
 
 State = base.State
@@ -298,7 +297,7 @@ class TransactionalImplementationWrapper(DjangoImplementationWrapper):
     """Customize the base ImplementationWrapper to run into a db transaction."""
 
     def __call__(self, *args, **kwargs):
-        with transaction.commit_on_success():
+        with atomic():
             return super(TransactionalImplementationWrapper, self).__call__(*args, **kwargs)
 
 
