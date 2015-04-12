@@ -1,4 +1,5 @@
 -r requirements.txt
 
 coverage
-South
+
+# South is installed from django-specific versions
