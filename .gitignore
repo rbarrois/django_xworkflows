@@ -3,6 +3,9 @@
 *.pyc
 *.pyo
 
+# Local data
+db.sqlite
+
 # Build-related files
 doc/_build/
 .coverage
