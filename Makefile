@@ -1,13 +1,15 @@
 
 
 DJANGO_VERSION ?= 1.8
-
+PYTHON_VERSION := $(shell python --version)
 NEXT_DJANGO_VERSION=$(shell python -c "v='$(DJANGO_VERSION)'; parts=v.split('.'); parts[-1]=str(int(parts[-1])+1); print('.'.join(parts))")
 
 default: test
 
+$(info $(PYTHON_VERSION))
 
 install-deps: auto_dev_requirements_django$(DJANGO_VERSION).txt
+	pip install --upgrade pip setuptools
 	pip install --upgrade -r $<
 	pip freeze
 
