@@ -2,6 +2,7 @@
 .*.swp
 *.pyc
 *.pyo
+auto_dev_requirements*
 
 # Local data
 db.sqlite
@@ -9,6 +10,7 @@ db.sqlite
 # Build-related files
 doc/_build/
 .coverage
+coverage.xml
 *.egg-info
 *.egg
 build/
