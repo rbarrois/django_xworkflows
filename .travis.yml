@@ -3,14 +3,12 @@ python:
   - "2.7"
   - "3.4"
 env:
-  - DJANGO_VERSION=1.4.20
-  - DJANGO_VERSION=1.7.7
+  - DJANGO_VERSION=1.40
+  - DJANGO_VERSION=1.7
   - DJANGO_VERSION=1.8
 script: "python setup.py test"
 install:
-  - pip install Django==$DJANGO_VERSION --quiet --use-mirrors
-  - pip install xworkflows --quiet --use-mirrors
-  - python setup.py --quiet install
+  - make install-deps
 notifications:
   email: false
   irc: "irc.freenode.org#XelNext"
