@@ -8,7 +8,11 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.conf import settings
-from django.contrib.contenttypes import generic
+try:
+    # Django >= 1.7
+    from django.contrib.contenttypes.fields import GenericForeignKey
+except ImportError:
+    from django.contrib.contenttypes.generic import GenericForeignKey
 from django.contrib.contenttypes import models as ct_models
 from django.core import exceptions
 from django.forms import fields
@@ -497,7 +501,7 @@ class GenericTransitionLog(BaseTransitionLog):
                                      blank=True, null=True)
     content_id = models.PositiveIntegerField(_("Content id"),
         blank=True, null=True, db_index=True)
-    modified_object = generic.GenericForeignKey(
+    modified_object = GenericForeignKey(
             ct_field="content_type",
             fk_field="content_id")
 
@@ -562,7 +566,7 @@ class GenericLastTransitionLog(BaseLastTransitionLog):
                                      blank=True, null=True)
     content_id = models.PositiveIntegerField(_("Content id"),
         blank=True, null=True, db_index=True)
-    modified_object = generic.GenericForeignKey(
+    modified_object = GenericForeignKey(
             ct_field="content_type",
             fk_field="content_id")
 
