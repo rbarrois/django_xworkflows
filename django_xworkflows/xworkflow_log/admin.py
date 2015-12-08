@@ -14,7 +14,7 @@ class TransitionLogAdmin(admin.ModelAdmin):
     date_hierarchy = 'timestamp'
     list_display = ('modified_object', 'transition', 'from_state', 'to_state', 'user', 'timestamp',)
     list_filter = ('content_type', 'transition',)
-    read_only_fields = ('user', 'modified_object', 'transition', 'timestamp',)
+    readonly_fields = ('user', 'modified_object', 'transition', 'timestamp',)
     search_fields = ('transition', 'user__username',)
 
     def has_add_permission(self, request):
