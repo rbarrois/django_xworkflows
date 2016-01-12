@@ -325,6 +325,7 @@ class LastTransitionLogTestCase(test.TestCase):
 
         self.obj.ab()
         self.assertEqual(1, models.SomeWorkflowLastTransitionLog.objects.count())
+        ab_datetime = models.SomeWorkflowLastTransitionLog.objects.get().timestamp
 
         self.obj.ba()
         self.assertEqual(1, models.SomeWorkflowLastTransitionLog.objects.count())
@@ -334,6 +335,7 @@ class LastTransitionLogTestCase(test.TestCase):
         self.assertEqual('ba', tlog.transition)
         self.assertEqual('b', tlog.from_state)
         self.assertEqual('a', tlog.to_state)
+        self.assertTrue(tlog.timestamp > ab_datetime)
 
 
 class GenericLastTransitionLogTestCase(test.TestCase):
@@ -356,6 +358,7 @@ class GenericLastTransitionLogTestCase(test.TestCase):
 
         self.obj.ab()
         self.assertEqual(1, models.GenericWorkflowLastTransitionLog.objects.count())
+        ab_datetime = models.GenericWorkflowLastTransitionLog.objects.get().timestamp
 
         self.obj.ba()
         self.assertEqual(1, models.GenericWorkflowLastTransitionLog.objects.count())
@@ -365,6 +368,7 @@ class GenericLastTransitionLogTestCase(test.TestCase):
         self.assertEqual('ba', tlog.transition)
         self.assertEqual('b', tlog.from_state)
         self.assertEqual('a', tlog.to_state)
+        self.assertTrue(tlog.timestamp > ab_datetime)
 
 
 @unittest.skipIf(south is None, "Couldn't import south.")

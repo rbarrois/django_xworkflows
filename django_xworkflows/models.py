@@ -522,6 +522,7 @@ class BaseLastTransitionLog(BaseTransitionLog):
         if not created:
             for field, value in kwargs.items():
                 setattr(last_transition, field, value)
+            last_transition.timestamp = now()
             last_transition.save()
 
         return last_transition
