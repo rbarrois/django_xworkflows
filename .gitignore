@@ -8,7 +8,7 @@ auto_dev_requirements*
 db.sqlite
 
 # Build-related files
-doc/_build/
+docs/_build/
 .coverage
 coverage.xml
 *.egg-info

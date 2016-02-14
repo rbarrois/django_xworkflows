@@ -1,34 +1,50 @@
+PACKAGE=django_xworkflows
+TESTS_DIR=tests
+DOC_DIR=docs
+
+# Use current python binary instead of system default.
+COVERAGE = python $(shell which coverage)
+
+# Dependencies
+DJANGO ?= 1.9
+NEXT_DJANGO = $(shell python -c "v='$(DJANGO)'; parts=v.split('.'); parts[-1]=str(int(parts[-1])+1); print('.'.join(parts))")
+
+REQ_FILE = auto_dev_requirements_django$(DJANGO).txt
+
+all: default
 
 
-DJANGO_VERSION ?= 1.9
-PYTHON_VERSION := $(shell python --version)
-NEXT_DJANGO_VERSION=$(shell python -c "v='$(DJANGO_VERSION)'; parts=v.split('.'); parts[-1]=str(int(parts[-1])+1); print('.'.join(parts))")
+default:
 
-default: test
 
-$(info $(PYTHON_VERSION))
-
-install-deps: auto_dev_requirements_django$(DJANGO_VERSION).txt
+install-deps: $(REQ_FILE)
 	pip install --upgrade pip setuptools
 	pip install --upgrade -r $<
 	pip freeze
 
 auto_dev_requirements_%.txt: dev_requirements_%.txt dev_requirements.txt requirements.txt
 	grep --no-filename "^[^#-]" $^ | grep -v "^Django" > $@
-	echo "Django>=$(DJANGO_VERSION),<$(NEXT_DJANGO_VERSION)" >> $@
+	echo "Django>=$(DJANGO),<$(NEXT_DJANGO)" >> $@
 
 clean:
-	rm -f auto_dev_requirements*
+	find . -type f -name '*.pyc' -delete
+	find . -type f -path '*/__pycache__/*' -delete
+	find . -type d -empty -delete
+	@rm -f auto_dev_requirements_*
+
 
 test: install-deps
-	python setup.py test
+	python -W default setup.py test
 
 
 coverage: install-deps
-	coverage run --branch --include="django_xworkflows/*.py,tests/*.py" setup.py test
+	$(COVERAGE) erase
+	$(COVERAGE) run "--include=$(PACKAGE)/*.py,$(TESTS_DIR)/*.py" --branch setup.py test
+	$(COVERAGE) report "--include=$(PACKAGE)/*.py,$(TESTS_DIR)/*.py"
+	$(COVERAGE) html "--include=$(PACKAGE)/*.py,$(TESTS_DIR)/*.py"
 
-coverage-xml-report: coverage
-	coverage xml --include="django_xworkflows/*.py,tests/*.py"
+doc:
+	$(MAKE) -C $(DOC_DIR) html
 
 
-.PHONY: clean install-deps test coverage coverage-xml-report
+.PHONY: all default clean coverage doc install-deps pylint test
