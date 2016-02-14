@@ -47,6 +47,11 @@ else:
 # 1.7: Now migrating
 if dj_major_minor >= (1, 7):
     from django.utils.deconstruct import deconstructible
+    from django.contrib.contenttypes.fields import GenericForeignKey
+    from django.apps import apps
+    get_model = apps.get_model
 else:
     def deconstructible(cls):
         return cls
+    from django.contrib.contenttypes.generic import GenericForeignKey
+    from django.db.models import get_model
