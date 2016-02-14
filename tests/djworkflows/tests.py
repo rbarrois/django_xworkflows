@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import unittest
 
 from django import VERSION as django_version
 from django.core import exceptions
@@ -18,7 +19,6 @@ from django.db import models as django_models
 from django import template
 from django import test
 from django.template import Template, Context
-from django.utils import unittest
 
 import xworkflows
 

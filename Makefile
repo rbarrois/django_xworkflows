@@ -1,6 +1,6 @@
 
 
-DJANGO_VERSION ?= 1.8
+DJANGO_VERSION ?= 1.9
 PYTHON_VERSION := $(shell python --version)
 NEXT_DJANGO_VERSION=$(shell python -c "v='$(DJANGO_VERSION)'; parts=v.split('.'); parts[-1]=str(int(parts[-1])+1); print('.'.join(parts))")
 
