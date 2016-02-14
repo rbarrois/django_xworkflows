@@ -7,7 +7,19 @@ ChangeLog
 
 *New:*
 
-    * Add compatibility for Django >= 1.8
+    * Add compatibility for Django up to 1.9
+
+*Bugfix:*
+
+    * Fix invalid default TransitionLog ModelAdmin (lacking
+      ``readonly_fields``), thanks to `btoueg <https://github.com/btoueg>`_
+    * Fix updating
+      :attr:`~django_xworkflows.models.BaseTransitionLog.timestamp` on
+      :class:`~django_xworkflows.models.BaseLastTransitionLog` instances,
+      thanks to `tanyunshi <https://github.com/tanyunshi>`_
+
+.. note:: This version drops support for Python 2.6; the next one will drop
+          Django<1.7.
 
 0.9.4 (2014-11-24)
 ------------------
