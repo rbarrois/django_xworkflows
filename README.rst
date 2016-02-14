@@ -1,6 +1,25 @@
 Django-XWorkflows
 =================
 
+.. image:: https://secure.travis-ci.org/rbarrois/django_xworkflows.png?branch=master
+    :target: http://travis-ci.org/rbarrois/django_xworkflows/
+
+.. image:: https://img.shields.io/pypi/v/django_xworkflows.svg
+    :target: http://django-xworkflows.readthedocs.org/en/latest/changelog.html
+    :alt: Latest Version
+
+.. image:: https://img.shields.io/pypi/pyversions/django_xworkflows.svg
+    :target: https://pypi.python.org/pypi/django_xworkflows/
+    :alt: Supported Python versions
+
+.. image:: https://img.shields.io/pypi/wheel/django_xworkflows.svg
+    :target: https://pypi.python.org/pypi/django_xworkflows/
+    :alt: Wheel status
+
+.. image:: https://img.shields.io/pypi/l/django_xworkflows.svg
+    :target: https://pypi.python.org/pypi/django_xworkflows/
+    :alt: License
+
 Use `XWorkflows <http://github.com/rbarrois/xworkflows/>`_ along with Django models.
 
 Django-XWorkflows allow to bind a Django model to a workflow, with a few extra features:
