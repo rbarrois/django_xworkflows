@@ -1,9 +1,9 @@
 include README.rst
 include ChangeLog
 recursive-include src *.po
-include doc/Makefile
-recursive-include doc *.py *.rst
-include doc/_static/.keep_dir
-prune doc/_build
+include docs/Makefile
+recursive-include docs *.py *.rst
+include docs/_static/.keep_dir
+prune docs/_build
 recursive-include tests *.py
 include requirements.txt
