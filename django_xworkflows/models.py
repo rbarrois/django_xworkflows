@@ -317,7 +317,9 @@ class _SerializedWorkflow(object):
         # Create a new django_xworkflows.models.Workflow subclass,
         # using the provided fields.
         workflow_class = base.WorkflowMeta(
-            self._name,
+            # When constructing from django.db.migrations, we might get a unicode instead of a str for the name; 
+            # this breaks calls to super()
+            str(self._name),
             (Workflow,),
             {
                 'states': [(st, st) for st in states],
