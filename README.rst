@@ -5,7 +5,7 @@ Django-XWorkflows
     :target: http://travis-ci.org/rbarrois/django_xworkflows/
 
 .. image:: https://img.shields.io/pypi/v/django_xworkflows.svg
-    :target: http://django-xworkflows.readthedocs.org/en/latest/changelog.html
+    :target: https://django-xworkflows.readthedocs.io/en/latest/changelog.html
     :alt: Latest Version
 
 .. image:: https://img.shields.io/pypi/pyversions/django_xworkflows.svg
@@ -71,5 +71,5 @@ Links
 
 * Package on PyPI: http://pypi.python.org/pypi/django-xworkflows
 * Repository and issues on GitHub: http://github.com/rbarrois/django_xworkflows
-* Doc on http://readthedocs.org/docs/django-xworkflows/
+* Doc on https://django-xworkflows.readthedocs.io/
 * XWorkflows on GitHub: http://github.com/rbarrois/xworkflows
