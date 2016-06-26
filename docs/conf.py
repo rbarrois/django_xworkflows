@@ -98,7 +98,7 @@ pygments_style = 'sphinx'
 #modindex_common_prefix = []
 
 intersphinx_mapping = {
-    'xworkflows': ('http://readthedocs.org/docs/xworkflows/en/latest/', None),
+    'xworkflows': ('https://xworkflows.readthedocs.io/en/latest/', None),
     'django': ('http://docs.djangoproject.com/en/dev/',
                'http://docs.djangoproject.com/en/dev/_objects/'),
 }
