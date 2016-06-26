@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+0.10.1 (2016-06-26)
+-------------------
+
+*Bugfix:*
+
+    * Don't choke on dj.db.migration passing in ``unicode`` instead of ``str``
+    * Fix packaging / docs layout
 
 0.10.0 (2016-02-15)
 -------------------
