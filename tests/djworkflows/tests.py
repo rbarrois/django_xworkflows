@@ -16,6 +16,7 @@ from django import VERSION as django_version
 from django.core import exceptions
 from django.core import serializers
 from django.db import models as django_models
+from django import forms
 from django import template
 from django import test
 from django.template import Template, Context
@@ -77,12 +78,18 @@ def override_env(**kwargs):
 
 
 class ModelTestCase(test.TestCase):
+    def get_field(self, model, field_name):
+        meta = model._meta
+        if hasattr(meta, 'get_field_by_name'):  # Django < 1.10
+            return meta.get_field_by_name(field_name)[0]
+        return meta.get_field(field_name)
+
     def test_workflow(self):
         self.assertEqual(models.MyWorkflow.states,
                          models.MyWorkflowEnabled._workflows['state'].workflow.states)
 
     def test_field_attributes(self):
-        field_def = models.MyWorkflowEnabled._meta.get_field_by_name('state')[0]
+        field_def = self.get_field(models.MyWorkflowEnabled, 'state')
         self.assertEqual(16, field_def.max_length)
         self.assertFalse(field_def.blank)
         self.assertFalse(field_def.null)
@@ -93,7 +100,7 @@ class ModelTestCase(test.TestCase):
         )
 
     def test_ald_field_attributes(self):
-        field_def = models.WithTwoWorkflows._meta.get_field_by_name('state2')[0]
+        field_def = self.get_field(models.WithTwoWorkflows, 'state2')
         self.assertEqual(19, field_def.max_length)
         self.assertFalse(field_def.blank)
         self.assertFalse(field_def.null)
@@ -529,3 +536,17 @@ class TemplateTestCase(test.TestCase):
         self.assertEqual(self.render_fragment("{{ obj.bazbar|safe}}"), text_type(self.obj.bazbar))
         self.assertEqual(self.render_fragment("{{ obj.bazbar.is_available }}"), self.uFalse)
         self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
+
+
+class WidgetTestCase(test.TestCase):
+
+    class MyWorkflowEnabledModelForm(forms.ModelForm):
+        class Meta:
+            model = models.MyWorkflowEnabled
+            fields = ('state',)
+
+    def test_StateSelect_widget(self):
+        form = self.MyWorkflowEnabledModelForm()
+        html = form.as_p()
+        # Just make sure that it can be rendered.
+        self.assertIn('<p>', html)
