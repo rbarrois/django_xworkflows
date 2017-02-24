@@ -15,6 +15,7 @@ import unittest
 from django.core import exceptions
 from django.core import serializers
 from django.db import models as django_models
+from django import forms
 from django import test
 from django.template import engines as template_engines
 
@@ -444,3 +445,17 @@ class TemplateTestCase(test.TestCase):
         self.assertEqual(self.render_fragment("{{ obj.bazbar|safe}}"), text_type(self.obj.bazbar))
         self.assertEqual(self.render_fragment("{{ obj.bazbar.is_available }}"), self.uFalse)
         self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
+
+
+class WidgetTestCase(test.TestCase):
+
+    class MyWorkflowEnabledModelForm(forms.ModelForm):
+        class Meta:
+            model = models.MyWorkflowEnabled
+            fields = ('state',)
+
+    def test_StateSelect_widget(self):
+        form = self.MyWorkflowEnabledModelForm()
+        html = form.as_p()
+        # Just make sure that it can be rendered.
+        self.assertIn('<p>', html)
