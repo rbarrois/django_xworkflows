@@ -1,2 +1,1 @@
-xworkflows>=0.4.0
-Django>=1.4
+# No hard external requirements.

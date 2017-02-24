@@ -4,40 +4,51 @@ DOC_DIR=docs
 
 # Use current python binary instead of system default.
 COVERAGE = python $(shell which coverage)
-
-# Dependencies
-DJANGO ?= 1.9
-NEXT_DJANGO = $(shell python -c "v='$(DJANGO)'; parts=v.split('.'); parts[-1]=str(int(parts[-1])+1); print('.'.join(parts))")
-
-REQ_FILE = auto_dev_requirements_django$(DJANGO).txt
+FLAKE8 = flake8
+MANAGE_PY = python manage.py
+DJANGO_ADMIN = django-admin.py
+PO_FILES = $(shell find $(PACKAGE) -name '*.po')
+MO_FILES = $(PO_FILES:.po=.mo)
 
 all: default
 
 
-default:
+default: build
 
-
-install-deps: $(REQ_FILE)
-	pip install --upgrade pip setuptools
-	pip install --upgrade -r $<
-	pip freeze
-
-auto_dev_requirements_%.txt: dev_requirements_%.txt dev_requirements.txt requirements.txt
-	grep --no-filename "^[^#-]" $^ | grep -v "^Django" > $@
-	echo "Django>=$(DJANGO),<$(NEXT_DJANGO)" >> $@
 
 clean:
 	find . -type f -name '*.pyc' -delete
 	find . -type f -path '*/__pycache__/*' -delete
 	find . -type d -empty -delete
-	@rm -f auto_dev_requirements_*
+	rm -f $(MO_FILES)
+	@rm -rf tmp_test/
+
+build: $(MO_FILES)
 
 
-test: install-deps
-	python -W default setup.py test
+%.mo: %.po
+	cd $(abspath $(dir $<)/../../..) && $(DJANGO_ADMIN) compilemessages
+
+update: build
+	pip install --upgrade pip setuptools
+	pip install --upgrade -r requirements_dev.txt
+	pip freeze
+
+testall:
+	tox
+
+test: build
+	PYTHONPATH=. python -Wdefault $(TESTS_DIR)/runner.py
 
 
-coverage: install-deps
+
+# Note: we run the linter in two runs, because our __init__.py files has specific warnings we want to exclude
+lint:
+	check-manifest
+	$(FLAKE8) --config .flake8 --exclude $(PACKAGE)/__init__.py $(PACKAGE)
+	$(FLAKE8) --config .flake8 --ignore F401 $(PACKAGE)/__init__.py
+
+coverage:
 	$(COVERAGE) erase
 	$(COVERAGE) run "--include=$(PACKAGE)/*.py,$(TESTS_DIR)/*.py" --branch setup.py test
 	$(COVERAGE) report "--include=$(PACKAGE)/*.py,$(TESTS_DIR)/*.py"
@@ -47,4 +58,4 @@ doc:
 	$(MAKE) -C $(DOC_DIR) html
 
 
-.PHONY: all default clean coverage doc install-deps pylint test
+.PHONY: all default clean coverage doc install-deps lint test

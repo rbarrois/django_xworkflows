@@ -1,0 +1,10 @@
+# Requirements for local development
+-e .
+-r requirements_test.txt
+
+coverage
+wheel
+tox
+
+Sphinx
+sphinx_rtd_theme

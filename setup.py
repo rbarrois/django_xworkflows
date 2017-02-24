@@ -4,11 +4,12 @@
 # This code is distributed under the two-clause BSD license.
 
 
+import codecs
 import os
 import re
 import sys
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 root_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -16,8 +17,8 @@ root_dir = os.path.abspath(os.path.dirname(__file__))
 def get_version(package_name):
     version_re = re.compile(r"^__version__ = [\"']([\w_.-]+)[\"']$")
     package_components = package_name.split('.')
-    path_components = package_components + ['__init__.py']
-    with open(os.path.join(root_dir, *path_components)) as f:
+    init_path = os.path.join(root_dir, *(package_components + ['__init__.py']))
+    with codecs.open(init_path, 'r', 'utf-8') as f:
         for line in f:
             match = version_re.match(line[:-1])
             if match:
@@ -25,43 +26,37 @@ def get_version(package_name):
     return '0.1.0'
 
 
-def parse_requirements(requirements_file):
-    with open(requirements_file, 'r') as f:
-        return [line for line in f if line.strip() and not line.startswith('#')]
-
-
-if sys.version_info[0:2] < (2, 7):
-    extra_tests_require = ['unittest2']
-else:
-    extra_tests_require = []
+def clean_readme(fname):
+    """Cleanup README.rst for proper PyPI formatting."""
+    with codecs.open(fname, 'r', 'utf-8') as f:
+        return ''.join(
+            re.sub(r':\w+:`([^`]+?)( <[^<>]+>)?`', r'``\1``', line)
+            for line in f
+            if not (line.startswith('.. currentmodule') or line.startswith('.. toctree'))
+        )
 
 
 PACKAGE = 'django_xworkflows'
-REQUIREMENTS_PATH = 'requirements.txt'
 
 
 setup(
-    name="django-xworkflows",
+    name=PACKAGE,
     version=get_version(PACKAGE),
     author="Raphaël Barrois",
-    author_email="raphael.barrois+xworkflows@polytechnique.org",
-    description=("A django app enabling Django models to use xworkflows."),
+    author_email="raphael.barrois+%s@polytechnique.org" % PACKAGE,
+    description="A django app enabling Django models to use xworkflows.",
     license="BSD",
     keywords="django workflow state machine automaton",
     url="http://github.com/rbarrois/django_xworkflows",
     download_url="http://pypi.python.org/pypi/django-xworkflows/",
-    packages=[
-        'django_xworkflows',
-        'django_xworkflows.xworkflow_log',
-        'django_xworkflows.xworkflow_log.migrations',
-        'django_xworkflows.management',
-        'django_xworkflows.management.commands',
-    ],
+    packages=find_packages(exclude=['dev', 'tests*']),
     setup_requires=[
         'setuptools>=0.8',
     ],
-    install_requires=parse_requirements(REQUIREMENTS_PATH),
-    tests_require=[] + extra_tests_require,
+    install_requires=[
+        'Django>=1.8',
+        'xworkflows',
+    ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",

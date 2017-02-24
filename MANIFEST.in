@@ -1,9 +1,12 @@
-include README.rst
-include ChangeLog
-recursive-include src *.po
-include docs/Makefile
-recursive-include docs *.py *.rst
-include docs/_static/.keep_dir
-prune docs/_build
-recursive-include tests *.py
-include requirements.txt
+include CREDITS ChangeLog LICENSE README.rst
+include requirements*.txt
+
+graft django_xworkflows
+
+prune dev
+prune docs
+prune tests
+
+global-exclude *.py[cod] __pycache__
+
+exclude Makefile tox.ini .flake8 manage.py
