@@ -31,7 +31,7 @@ transition = base.transition
 class StateSelect(widgets.Select):
     """Custom 'select' widget to handle state retrieval."""
 
-    def render(self, name, value, attrs=None, choices=()):
+    def render(self, name, value, attrs=None, *args, **kwargs):
         """Handle a few expected values for rendering the current choice.
 
         Extracts the state name from StateWrapper and State object.
@@ -42,7 +42,7 @@ class StateSelect(widgets.Select):
             state_name = value.name
         else:
             state_name = str(value)
-        return super(StateSelect, self).render(name, state_name, attrs, choices)
+        return super(StateSelect, self).render(name, state_name, attrs, *args, **kwargs)
 
 
 class StateFieldProperty(object):
@@ -584,4 +584,3 @@ class GenericLastTransitionLog(BaseLastTransitionLog):
         unique_fields['content_id'] = content_id
 
         return super(GenericLastTransitionLog, cls)._update_or_create(unique_fields, **kwargs)
-
