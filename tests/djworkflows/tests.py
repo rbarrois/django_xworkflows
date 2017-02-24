@@ -82,7 +82,7 @@ class ModelTestCase(test.TestCase):
                          models.MyWorkflowEnabled._workflows['state'].workflow.states)
 
     def test_field_attributes(self):
-        field_def = models.MyWorkflowEnabled._meta.get_field_by_name('state')[0]
+        field_def = models.MyWorkflowEnabled._meta.get_field('state')
         self.assertEqual(16, field_def.max_length)
         self.assertFalse(field_def.blank)
         self.assertFalse(field_def.null)
@@ -93,7 +93,7 @@ class ModelTestCase(test.TestCase):
         )
 
     def test_ald_field_attributes(self):
-        field_def = models.WithTwoWorkflows._meta.get_field_by_name('state2')[0]
+        field_def = models.WithTwoWorkflows._meta.get_field('state2')
         self.assertEqual(19, field_def.max_length)
         self.assertFalse(field_def.blank)
         self.assertFalse(field_def.null)
