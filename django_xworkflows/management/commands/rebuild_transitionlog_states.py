@@ -50,9 +50,10 @@ class Command(base.LabelCommand):
 
             for log in qs:
                 try:
-                    transition = workflow.transitions[log.transition]
+                    workflow.transitions[log.transition]
                 except KeyError:
-                    self.stderr.write("Unknown transition %s in log %d for %s %d\n" % (log.transition, log.pk, label, pk))
+                    self.stderr.write(
+                        "Unknown transition %s in log %d for %s %d\n" % (log.transition, log.pk, label, pk))
                     continue
 
                 updated = False

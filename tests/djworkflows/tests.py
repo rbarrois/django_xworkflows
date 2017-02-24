@@ -23,14 +23,15 @@ import xworkflows
 from django_xworkflows import models as xwf_models
 from django_xworkflows.xworkflow_log import models as xwlog_models
 
+from . import models
+
+
 if sys.version_info[0] <= 2:
     def text_type(text):
-        return unicode(text)
+        return unicode(text)  # noqa: F821
 else:
     def text_type(text):
         return str(text)
-
-from . import models
 
 
 @contextlib.contextmanager
@@ -47,6 +48,7 @@ def extra_pythonpath(pythonpath):
     else:
         os.environ['PYTHONPATH'] = old_path
 
+
 @contextlib.contextmanager
 def override_env(**kwargs):
     old_values = {}
@@ -60,7 +62,6 @@ def override_env(**kwargs):
             del os.environ[k]
         else:
             os.environ[k] = v
-
 
 
 class ModelTestCase(test.TestCase):
@@ -94,10 +95,8 @@ class ModelTestCase(test.TestCase):
         self.assertIn('state1', models.WithTwoWorkflows._workflows)
         self.assertIn('state2', models.WithTwoWorkflows._workflows)
 
-        self.assertEqual('Foo',
-                models.WithTwoWorkflows._workflows['state1'].workflow.states['foo'].title)
-        self.assertEqual('StateA',
-                models.WithTwoWorkflows._workflows['state2'].workflow.states['a'].title)
+        self.assertEqual('Foo', models.WithTwoWorkflows._workflows['state1'].workflow.states['foo'].title)
+        self.assertEqual('StateA', models.WithTwoWorkflows._workflows['state2'].workflow.states['a'].title)
 
     def test_instantiation(self):
         o = models.MyWorkflowEnabled()
@@ -154,8 +153,7 @@ class ModelTestCase(test.TestCase):
 
         self.assertTrue(o.state.is_bar)
 
-        data = serializers.serialize('json',
-                models.MyWorkflowEnabled.objects.filter(pk=o.id))
+        data = serializers.serialize('json', models.MyWorkflowEnabled.objects.filter(pk=o.id))
 
         models.MyWorkflowEnabled.objects.all().delete()
 
@@ -168,12 +166,12 @@ class ModelTestCase(test.TestCase):
     def test_invalid_dump(self):
         data = '[{"pk": 1, "model": "djworkflows.myworkflowenabled", "fields": {"state": "blah"}}]'
 
-        self.assertRaises(serializers.base.DeserializationError, list,
-            serializers.deserialize('json', data))
+        self.assertRaises(serializers.base.DeserializationError, list, serializers.deserialize('json', data))
 
 
 class InheritanceTestCase(test.TestCase):
     """Tests inheritance-related behaviour."""
+
     def test_simple(self):
         class BaseWorkflowEnabled(xwf_models.WorkflowEnabled, django_models.Model):
             state = xwf_models.StateField(models.MyWorkflow)
@@ -187,6 +185,7 @@ class InheritanceTestCase(test.TestCase):
     def test_abstract(self):
         class AbstractWorkflowEnabled(xwf_models.WorkflowEnabled, django_models.Model):
             state = xwf_models.StateField(models.MyWorkflow)
+
             class Meta:
                 abstract = True
 
@@ -421,10 +420,16 @@ class TemplateTestCase(test.TestCase):
 
     def test_state(self):
         self.assertEqual(self.render_fragment("{{ obj.state.is_foo }}"), self.uTrue)
-        self.assertEqual(self.render_fragment("{% if obj.state == 'foo' %}{{ true }}{% else %}{{ false }}{% endif %}"), self.uTrue)
+        self.assertEqual(
+            self.render_fragment("{% if obj.state == 'foo' %}{{ true }}{% else %}{{ false }}{% endif %}"),
+            self.uTrue,
+        )
 
         self.assertEqual(self.render_fragment("{{ obj.state.is_bar }}"), self.uFalse)
-        self.assertEqual(self.render_fragment("{% if obj.state == 'bar' %}{{ true }}{% else %}{{ false }}{% endif %}"), self.uFalse)
+        self.assertEqual(
+            self.render_fragment("{% if obj.state == 'bar' %}{{ true }}{% else %}{{ false }}{% endif %}"),
+            self.uFalse,
+        )
 
     def test_django_magic(self):
         """Ensure that ImplementationWrappers have magic django attributes."""

@@ -168,7 +168,7 @@ class StateField(models.Field):
             raise exceptions.ValidationError(self.error_messages['wrong_type'] % value)
         elif not value.workflow == self.workflow:
             raise exceptions.ValidationError(self.error_messages['wrong_workflow'] % value.workflow)
-        elif not value.state in self.workflow.states:
+        elif value.state not in self.workflow.states:
             raise exceptions.ValidationError(self.error_messages['invalid_state'] % value.state)
 
     def formfield(self, form_class=fields.ChoiceField, widget=StateSelect, **kwargs):
@@ -300,7 +300,7 @@ class _SerializedWorkflow(object):
         # Create a new django_xworkflows.models.Workflow subclass,
         # using the provided fields.
         workflow_class = base.WorkflowMeta(
-            # When constructing from django.db.migrations, we might get a unicode instead of a str for the name; 
+            # When constructing from django.db.migrations, we might get a unicode instead of a str for the name;
             # this breaks calls to super()
             str(self._name),
             (Workflow,),
@@ -382,11 +382,11 @@ class Workflow(base.Workflow):
                 extras[db_field] = kwargs.get(transition_arg, default)
 
             return model_class.log_transition(
-                    modified_object=instance,
-                   transition=transition.name,
-                   from_state=from_state.name,
-                   to_state=transition.target.name,
-                   **extras)
+                modified_object=instance,
+                transition=transition.name,
+                from_state=from_state.name,
+                to_state=transition.target.name,
+                **extras)
 
     def log_transition(self, transition, from_state, instance, *args, **kwargs):
         """Generic transition logging."""
@@ -426,14 +426,10 @@ class BaseTransitionLog(models.Model):
     MODIFIED_OBJECT_FIELD = ''
     EXTRA_LOG_ATTRIBUTES = ()
 
-    transition = models.CharField(_("transition"), max_length=255,
-        db_index=True)
-    from_state = models.CharField(_("from state"), max_length=255,
-        db_index=True)
-    to_state = models.CharField(_("to state"), max_length=255,
-        db_index=True)
-    timestamp = models.DateTimeField(_("performed at"),
-        default=timezone.now, db_index=True)
+    transition = models.CharField(_("transition"), max_length=255, db_index=True)
+    from_state = models.CharField(_("from state"), max_length=255, db_index=True)
+    to_state = models.CharField(_("to state"), max_length=255, db_index=True)
+    timestamp = models.DateTimeField(_("performed at"), default=timezone.now, db_index=True)
 
     class Meta:
         ordering = ('-timestamp', 'transition')
@@ -457,8 +453,12 @@ class BaseTransitionLog(models.Model):
         return cls.objects.create(**kwargs)
 
     def __str__(self):
-        return '%r: %s -> %s at %s' % (self.get_modified_object(),
-            self.from_state, self.to_state, self.timestamp.isoformat())
+        return "%r: %s -> %s at %s" % (
+            self.get_modified_object(),
+            self.from_state,
+            self.to_state,
+            self.timestamp.isoformat(),
+        )
 
 
 class GenericTransitionLog(BaseTransitionLog):
@@ -476,14 +476,9 @@ class GenericTransitionLog(BaseTransitionLog):
     """
     MODIFIED_OBJECT_FIELD = 'modified_object'
 
-    content_type = models.ForeignKey(ct_models.ContentType,
-                                     verbose_name=_("Content type"),
-                                     blank=True, null=True)
-    content_id = models.PositiveIntegerField(_("Content id"),
-        blank=True, null=True, db_index=True)
-    modified_object = ct_fields.GenericForeignKey(
-            ct_field="content_type",
-            fk_field="content_id")
+    content_type = models.ForeignKey(ct_models.ContentType, verbose_name=_("Content type"), blank=True, null=True)
+    content_id = models.PositiveIntegerField(_("Content id"), blank=True, null=True, db_index=True)
+    modified_object = ct_fields.GenericForeignKey(ct_field="content_type", fk_field="content_id")
 
     class Meta:
         ordering = ('-timestamp', 'transition')
@@ -541,21 +536,17 @@ class GenericLastTransitionLog(BaseLastTransitionLog):
     """
     MODIFIED_OBJECT_FIELD = 'modified_object'
 
-    content_type = models.ForeignKey(ct_models.ContentType,
-                                     verbose_name=_("Content type"),
-                                     related_name='last_transition_logs',
-                                     blank=True, null=True)
-    content_id = models.PositiveIntegerField(_("Content id"),
-        blank=True, null=True, db_index=True)
-    modified_object = ct_fields.GenericForeignKey(
-            ct_field="content_type",
-            fk_field="content_id")
+    content_type = models.ForeignKey(
+        ct_models.ContentType, verbose_name=_("Content type"), related_name='last_transition_logs',
+        blank=True, null=True)
+    content_id = models.PositiveIntegerField(_("Content id"), blank=True, null=True, db_index=True)
+    modified_object = ct_fields.GenericForeignKey(ct_field="content_type", fk_field="content_id")
 
     class Meta:
         verbose_name = _('XWorkflow last transition log')
         verbose_name_plural = _('XWorkflow last transition logs')
         abstract = True
-        unique_together =  ('content_type', 'content_id')
+        unique_together = ('content_type', 'content_id')
 
     @classmethod
     def _update_or_create(cls, unique_fields, **kwargs):
@@ -567,4 +558,3 @@ class GenericLastTransitionLog(BaseLastTransitionLog):
         unique_fields['content_id'] = content_id
 
         return super(GenericLastTransitionLog, cls)._update_or_create(unique_fields, **kwargs)
-

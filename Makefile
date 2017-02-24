@@ -47,6 +47,7 @@ lint:
 	check-manifest
 	$(FLAKE8) --config .flake8 --exclude $(PACKAGE)/__init__.py $(PACKAGE)
 	$(FLAKE8) --config .flake8 --ignore F401 $(PACKAGE)/__init__.py
+	$(FLAKE8) --config .flake8 $(TESTS_DIR)
 
 coverage:
 	$(COVERAGE) erase

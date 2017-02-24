@@ -5,11 +5,12 @@
 
 from __future__ import unicode_literals
 
-import os
 import sys
 
 import django
 from django.conf import settings
+from django.test.runner import DiscoverRunner as DjangoTestSuiteRunner
+
 
 if not settings.configured:
     settings.configure(
@@ -33,7 +34,6 @@ if not settings.configured:
 
 django.setup()
 
-from django.test.runner import DiscoverRunner as DjangoTestSuiteRunner
 default_test_args = 'tests.djworkflows'
 
 
@@ -47,4 +47,3 @@ def runtests(*test_args):
 
 if __name__ == '__main__':
     runtests(*sys.argv[1:])
-

@@ -24,4 +24,3 @@ class ProjectWorkflow(xwf_models.Workflow):
 class Project(xwf_models.WorkflowEnabled, models.Model):
     name = models.CharField(max_length=100)
     state = xwf_models.StateField(ProjectWorkflow)
-

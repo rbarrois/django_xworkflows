@@ -9,6 +9,7 @@ import xworkflows
 
 from django_xworkflows import models as dxmodels
 
+
 class MyWorkflow(dxmodels.Workflow):
     states = (
         ('foo', "Foo"),
