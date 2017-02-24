@@ -6,17 +6,21 @@ from __future__ import unicode_literals
 
 """Specific versions of XWorkflows to use with Django."""
 
+from django.apps import apps
 from django.db import models
+from django.db import transaction
 from django.conf import settings
+from django.contrib.contenttypes import fields as ct_fields
 from django.contrib.contenttypes import models as ct_models
 from django.core import exceptions
 from django.forms import fields
 from django.forms import widgets
+from django.utils.deconstruct import deconstructible
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from xworkflows import base
-
-from . import compat
 
 
 State = base.State
@@ -170,27 +174,6 @@ class StateField(models.Field):
     def formfield(self, form_class=fields.ChoiceField, widget=StateSelect, **kwargs):
         return super(StateField, self).formfield(form_class, widget=widget, **kwargs)
 
-    def south_field_triple(self):
-        """Return a suitable description of this field for South."""
-        from south.modelsinspector import introspector
-        args, kwargs = introspector(self)
-
-        state_def = tuple(
-            (str(st.name), str(st.name)) for st in self.workflow.states)
-        initial_state_def = str(self.workflow.initial_state.name)
-
-        workflow = (
-            "__import__('xworkflows', globals(), locals()).base.WorkflowMeta("
-            "'%(class_name)s', (), "
-            "{'states': %(states)r, 'initial_state': %(initial_state)r})" % {
-                'class_name': str(self.workflow.__class__.__name__),
-                'states': state_def,
-                'initial_state': initial_state_def,
-            })
-        kwargs['workflow'] = workflow
-
-        return ('django_xworkflows.models.StateField', args, kwargs)
-
     def deconstruct(self):
         """Deconstruction for migrations.
 
@@ -256,7 +239,7 @@ class BaseWorkflowEnabled(base.BaseWorkflowEnabled):
     def _get_FIELD_display(self, field):
         if isinstance(field, StateField):
             value = getattr(self, field.attname)
-            return compat.force_text(value.title)
+            return force_text(value.title)
         else:
             return super(BaseWorkflowEnabled, self)._get_FIELD_display(field)
 
@@ -296,11 +279,11 @@ class TransactionalImplementationWrapper(DjangoImplementationWrapper):
     """Customize the base ImplementationWrapper to run into a db transaction."""
 
     def __call__(self, *args, **kwargs):
-        with compat.atomic():
+        with transaction.atomic():
             return super(TransactionalImplementationWrapper, self).__call__(*args, **kwargs)
 
 
-@compat.deconstructible
+@deconstructible
 class _SerializedWorkflow(object):
     """Serialized workflow for django.db.migrations.
 
@@ -386,7 +369,7 @@ class Workflow(base.Workflow):
             return self.log_model_class
 
         app_label, model_label = self.log_model.rsplit('.', 1)
-        self.log_model_class = compat.get_model(app_label, model_label)
+        self.log_model_class = apps.get_model(app_label, model_label)
         return self.log_model_class
 
     def db_log(self, transition, from_state, instance, *args, **kwargs):
@@ -417,7 +400,7 @@ class Workflow(base.Workflow):
             self.db_log(transition, from_state, instance, *args, **kwargs)
 
 
-@compat.python_2_unicode_compatible
+@python_2_unicode_compatible
 class BaseTransitionLog(models.Model):
     """Abstract model for a minimal database logging setup.
 
@@ -450,7 +433,7 @@ class BaseTransitionLog(models.Model):
     to_state = models.CharField(_("to state"), max_length=255,
         db_index=True)
     timestamp = models.DateTimeField(_("performed at"),
-        default=compat.now, db_index=True)
+        default=timezone.now, db_index=True)
 
     class Meta:
         ordering = ('-timestamp', 'transition')
@@ -498,7 +481,7 @@ class GenericTransitionLog(BaseTransitionLog):
                                      blank=True, null=True)
     content_id = models.PositiveIntegerField(_("Content id"),
         blank=True, null=True, db_index=True)
-    modified_object = compat.GenericForeignKey(
+    modified_object = ct_fields.GenericForeignKey(
             ct_field="content_type",
             fk_field="content_id")
 
@@ -523,7 +506,7 @@ class BaseLastTransitionLog(BaseTransitionLog):
         if not created:
             for field, value in kwargs.items():
                 setattr(last_transition, field, value)
-            last_transition.timestamp = compat.now()
+            last_transition.timestamp = timezone.now()
             last_transition.save()
 
         return last_transition
@@ -564,7 +547,7 @@ class GenericLastTransitionLog(BaseLastTransitionLog):
                                      blank=True, null=True)
     content_id = models.PositiveIntegerField(_("Content id"),
         blank=True, null=True, db_index=True)
-    modified_object = compat.GenericForeignKey(
+    modified_object = ct_fields.GenericForeignKey(
             ct_field="content_type",
             fk_field="content_id")
 

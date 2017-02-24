@@ -12,11 +12,9 @@ import sys
 import tempfile
 import unittest
 
-from django import VERSION as django_version
 from django.core import exceptions
 from django.core import serializers
 from django.db import models as django_models
-from django import template
 from django import test
 from django.template import engines as template_engines
 
@@ -24,17 +22,6 @@ import xworkflows
 
 from django_xworkflows import models as xwf_models
 from django_xworkflows.xworkflow_log import models as xwlog_models
-
-if django_version[:2] < (1, 8):
-    try:
-        import south
-        import south.orm
-        import south.creator.freezer
-        import south.modelsinspector
-    except ImportError:
-        south = None
-else:
-    south = None
 
 if sys.version_info[0] <= 2:
     def text_type(text):
@@ -181,12 +168,7 @@ class ModelTestCase(test.TestCase):
     def test_invalid_dump(self):
         data = '[{"pk": 1, "model": "djworkflows.myworkflowenabled", "fields": {"state": "blah"}}]'
 
-        if django_version[:3] >= (1, 4, 0):
-            error_class = serializers.base.DeserializationError
-        else:
-            error_class = exceptions.ValidationError
-
-        self.assertRaises(error_class, list,
+        self.assertRaises(serializers.base.DeserializationError, list,
             serializers.deserialize('json', data))
 
 
@@ -371,73 +353,14 @@ class GenericLastTransitionLogTestCase(test.TestCase):
         self.assertTrue(tlog.timestamp > ab_datetime)
 
 
-@unittest.skipIf(south is None, "Couldn't import south.")
-@unittest.skipIf(django_version[:2] >= (1, 7), "South not compatible with Django>=1.7.")
-class SouthTestCase(test.TestCase):
-    """Tests south-related behavior."""
-
-    frozen_workflow = (
-        "__import__('xworkflows', globals(), locals()).base.WorkflowMeta("
-        "'MyWorkflow', (), {'states': (('foo', 'foo'), ('bar', 'bar'), "
-        "('baz', 'baz')), 'initial_state': 'foo'})")
-
-    def test_south_triple(self):
-        field = models.MyWorkflowEnabled._meta.get_field_by_name('state')[0]
-        triple = field.south_field_triple()
-
-        self.assertEqual(
-            (
-                'django_xworkflows.models.StateField',  # Class
-                [],  # *args
-                {
-                    'default': "'foo'" if sys.version_info[0] >= 3 else "u'foo'",
-                    'max_length': '16',
-                    'workflow': self.frozen_workflow},  # **kwargs
-            ), triple)
-
-    def test_freezing_model(self):
-        frozen = south.modelsinspector.get_model_fields(models.MyWorkflowEnabled)
-
-        self.assertEqual(self.frozen_workflow, frozen['state'][2]['workflow'])
-
-    def test_freezing_app(self):
-        frozen = south.creator.freezer.freeze_apps('djworkflows')
-        self.assertEqual(self.frozen_workflow, frozen['djworkflows.myworkflowenabled']['state'][2]['workflow'])
-
-    def test_frozen_orm(self):
-        frozen = south.creator.freezer.freeze_apps('djworkflows')
-
-        class FakeMigration(object):
-            models = frozen
-
-        frozen_orm = south.orm.FakeORM(FakeMigration, 'djworkflows')
-
-        frozen_model = frozen_orm.MyWorkflowEnabled
-        frozen_field = frozen_model._meta.get_field_by_name('state')[0]
-
-        for state in models.MyWorkflow.states:
-            frozen_state = frozen_field.workflow.states[state.name]
-            self.assertEqual(state.name, frozen_state.name)
-
-        self.assertEqual(models.MyWorkflow.initial_state.name,
-            frozen_field.workflow.initial_state.name)
-
-
-@unittest.skipIf(django_version[:2] < (1, 7), "Migrations unavailable in Django<1.7")
 class StateFieldMigrationTests(test.TestCase):
     def test_modelstate(self):
         from django.db.migrations import state as migrations_state
         mwe_mstate = migrations_state.ModelState.from_model(models.MyWorkflowEnabled)
         project_state = migrations_state.ProjectState()
 
-        if django_version[:2] < (1, 8):
-            # The method changed between 1.7 and 1.8
-            project_state.add_model_state(mwe_mstate)
-            apps = project_state.render()
-        else:
-            project_state.add_model(mwe_mstate)
-            apps = project_state.apps
-
+        project_state.add_model(mwe_mstate)
+        apps = project_state.apps
 
         model = apps.get_model('djworkflows.MyWorkflowEnabled')
         self.assertEqual(
@@ -446,7 +369,6 @@ class StateFieldMigrationTests(test.TestCase):
         )
 
 
-@unittest.skipIf(django_version[:2] < (1, 7), "Migrations unavailable in Django<1.7")
 class ProjectMigrationTests(test.TestCase):
     DEMO_PROJECT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'demo_project')
 
@@ -483,7 +405,7 @@ class TemplateTestCase(test.TestCase):
 
     def setUp(self):
         self.obj = models.MyWorkflowEnabled()
-        self.context = template.Context({'obj': self.obj, 'true': self.uTrue, 'false': self.uFalse})
+        self.context = {'obj': self.obj, 'true': self.uTrue, 'false': self.uFalse}
 
     def render_fragment(self, fragment):
         tpl = template_engines['django'].from_string(fragment)
@@ -509,19 +431,6 @@ class TemplateTestCase(test.TestCase):
         self.assertTrue(self.obj.foobar.alters_data)
         self.assertTrue(self.obj.foobar.do_not_call_in_templates)
 
-    @unittest.skipIf(django_version[:2] >= (1, 4), "foo.do_not_call_in_templates implemented since django>=1.4")
-    def test_transition_hidden(self):
-        """Tests that django (<1.4) will prevent calling the template."""
-
-        self.assertEqual(self.render_fragment("{{ obj.foobar}}"), "")
-        self.assertEqual(self.render_fragment("{{ obj.foobar.is_available }}"), "")
-        self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
-
-        self.assertEqual(self.render_fragment("{{ obj.bazbar|safe}}"), "")
-        self.assertEqual(self.render_fragment("{{ obj.bazbar.is_available }}"), "")
-        self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
-
-    @unittest.skipIf(django_version[:2] < (1, 4), "foo.do_not_call_in_templates requires django>=1.4")
     def test_transaction_attributes(self):
         self.assertEqual(self.render_fragment("{{ obj.foobar|safe}}"), text_type(self.obj.foobar))
         self.assertEqual(self.render_fragment("{{ obj.foobar.is_available }}"), self.uTrue)

@@ -1,4 +1,4 @@
-This minimalistic django project helps to generate the adequate south migrations.
+This minimalistic django project helps to generate the adequate migrations.
 
 Simply run::
 

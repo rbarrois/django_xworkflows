@@ -101,11 +101,6 @@ INSTALLED_APPS = (
     'django_xworkflows.xworkflow_log',
 )
 
-if django.VERSION[:2] < (1, 7):
-    INSTALLED_APPS = INSTALLED_APPS + (
-        'south',
-    )
-
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error.
