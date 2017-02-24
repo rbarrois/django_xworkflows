@@ -26,6 +26,9 @@ if not settings.configured:
             'django_xworkflows.xworkflow_log',
         ],
         MIDDLEWARE_CLASSES=[],
+        TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        }],
     )
 
 if django.VERSION[:2] >= (1, 7):

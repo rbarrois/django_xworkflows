@@ -18,7 +18,7 @@ from django.core import serializers
 from django.db import models as django_models
 from django import template
 from django import test
-from django.template import Template, Context
+from django.template import engines as template_engines
 
 import xworkflows
 
@@ -486,7 +486,8 @@ class TemplateTestCase(test.TestCase):
         self.context = template.Context({'obj': self.obj, 'true': self.uTrue, 'false': self.uFalse})
 
     def render_fragment(self, fragment):
-        return template.Template(fragment).render(self.context)
+        tpl = template_engines['django'].from_string(fragment)
+        return tpl.render(self.context)
 
     @unittest.skipIf(int(xworkflows.__version__.split('.')[0]) >= 1, "Behaviour changed in xworkflows-1.0.0")
     def test_state_display_is_title(self):
