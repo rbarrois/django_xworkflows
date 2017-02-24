@@ -6,10 +6,10 @@ DOC_DIR=docs
 COVERAGE = python $(shell which coverage)
 
 # Dependencies
-DJANGO ?= 1.9
-NEXT_DJANGO = $(shell python -c "v='$(DJANGO)'; parts=v.split('.'); parts[-1]=str(int(parts[-1])+1); print('.'.join(parts))")
+DJANGO_VERSION ?= 1.9
+NEXT_DJANGO_VERSION = $(shell python -c "v='$(DJANGO_VERSION)'; parts=v.split('.'); parts[-1]=str(int(parts[-1])+1); print('.'.join(parts))")
 
-REQ_FILE = auto_dev_requirements_django$(DJANGO).txt
+REQ_FILE = auto_dev_requirements_django$(DJANGO_VERSION).txt
 
 all: default
 
@@ -24,7 +24,7 @@ install-deps: $(REQ_FILE)
 
 auto_dev_requirements_%.txt: dev_requirements_%.txt dev_requirements.txt requirements.txt
 	grep --no-filename "^[^#-]" $^ | grep -v "^Django" > $@
-	echo "Django>=$(DJANGO),<$(NEXT_DJANGO)" >> $@
+	echo "Django>=$(DJANGO_VERSION),<$(NEXT_DJANGO_VERSION)" >> $@
 
 clean:
 	find . -type f -name '*.pyc' -delete
