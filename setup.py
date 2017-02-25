@@ -45,6 +45,7 @@ setup(
     author="Raphaël Barrois",
     author_email="raphael.barrois+%s@polytechnique.org" % PACKAGE,
     description="A django app enabling Django models to use xworkflows.",
+    long_description=clean_readme('README.rst'),
     license="BSD",
     keywords="django workflow state machine automaton",
     url="http://github.com/rbarrois/django_xworkflows",
