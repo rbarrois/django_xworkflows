@@ -29,7 +29,7 @@ build: $(MO_FILES)
 %.mo: %.po
 	cd $(abspath $(dir $<)/../../..) && $(DJANGO_ADMIN) compilemessages
 
-update: build
+update:
 	pip install --upgrade pip setuptools
 	pip install --upgrade -r requirements_dev.txt
 	pip freeze
