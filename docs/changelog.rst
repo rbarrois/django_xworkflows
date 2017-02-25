@@ -1,6 +1,16 @@
 ChangeLog
 =========
 
+0.11.0 (2017-02-25)
+-------------------
+
+*New:*
+
+    * Add compatibility for Django up to 1.10 and Python 3.6
+
+.. note:: This version drops support for Python 3.0-3.3 and Django<1.8.
+
+
 0.10.1 (2016-06-26)
 -------------------
 
