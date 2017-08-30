@@ -32,4 +32,5 @@ class TransitionLog(models.GenericTransitionLog):
 
     user = django_models.ForeignKey(
         getattr(settings, 'XWORKFLOWS_USER_MODEL', getattr(settings, 'AUTH_USER_MODEL', 'auth.User')),
-        blank=True, null=True, verbose_name=_("author"))
+        blank=True, null=True, on_delete=django_models.CASCADE, verbose_name=_("author"),
+    )

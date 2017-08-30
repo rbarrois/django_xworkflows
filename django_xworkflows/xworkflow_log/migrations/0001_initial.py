@@ -26,8 +26,8 @@ class Migration(migrations.Migration):
                 ('to_state', models.CharField(max_length=255, verbose_name='to state', db_index=True)),
                 ('timestamp', models.DateTimeField(default=django.utils.timezone.now, verbose_name='performed at', db_index=True)),
                 ('content_id', models.PositiveIntegerField(db_index=True, null=True, verbose_name='Content id', blank=True)),
-                ('content_type', models.ForeignKey(verbose_name='Content type', blank=True, to='contenttypes.ContentType', null=True)),
-                ('user', models.ForeignKey(verbose_name='author', blank=True, to=XWORKFLOWS_USER_MODEL, null=True)),
+                ('content_type', models.ForeignKey(verbose_name='Content type', blank=True, to='contenttypes.ContentType', null=True, on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(verbose_name='author', blank=True, to=XWORKFLOWS_USER_MODEL, null=True, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('-timestamp', 'transition'),
