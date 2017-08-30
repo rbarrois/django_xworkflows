@@ -1,6 +1,15 @@
 ChangeLog
 =========
 
+0.12.0 (unreleased)
+-------------------
+
+*New:*
+
+    * Add compatibility for Django up to 1.11
+
+.. note:: This version drops support for Django==1.9
+
 0.11.0 (2017-02-25)
 -------------------
 
