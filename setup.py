@@ -7,9 +7,11 @@
 import codecs
 import os
 import re
+import subprocess
 import sys
 
 from setuptools import setup, find_packages
+from setuptools.command import build_py
 
 root_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -36,6 +38,13 @@ def clean_readme(fname):
         )
 
 
+class BuildWithMakefile(build_py.build_py):
+    """Custom 'build' command that runs 'make build' first."""
+    def run(self):
+        subprocess.check_call(['make', 'build'])
+        return super(BuildWithMakefile, self).run()
+
+
 PACKAGE = 'django_xworkflows'
 
 
@@ -51,6 +60,8 @@ setup(
     url="http://github.com/rbarrois/django_xworkflows",
     download_url="http://pypi.python.org/pypi/django-xworkflows/",
     packages=find_packages(exclude=['dev', 'tests*']),
+    cmdclass={'build_py': BuildWithMakefile},
+    include_package_data=True,
     setup_requires=[
         'setuptools>=0.8',
     ],
