@@ -540,7 +540,8 @@ class GenericLastTransitionLog(BaseLastTransitionLog):
 
     content_type = models.ForeignKey(
         ct_models.ContentType, verbose_name=_("Content type"), related_name='last_transition_logs',
-        blank=True, null=True)
+        blank=True, null=True, on_delete=models.CASCADE,
+    )
     content_id = models.PositiveIntegerField(_("Content id"), blank=True, null=True, db_index=True)
     modified_object = ct_fields.GenericForeignKey(ct_field="content_type", fk_field="content_id")
 
