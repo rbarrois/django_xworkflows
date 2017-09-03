@@ -4,7 +4,9 @@ ChangeLog
 0.12.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+*Bugfix:*
+
+    - Add missing ``on_delete`` calls for Django>=1.11.
 
 
 0.12.0 (2017-08-30)
