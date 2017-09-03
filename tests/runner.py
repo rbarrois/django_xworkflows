@@ -34,7 +34,7 @@ if not settings.configured:
 
 django.setup()
 
-default_test_args = 'tests.djworkflows'
+default_test_args = 'tests.djworkflows.tests'
 
 
 def runtests(*test_args):
