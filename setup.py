@@ -42,7 +42,10 @@ class BuildWithMakefile(build_py.build_py):
     """Custom 'build' command that runs 'make build' first."""
     def run(self):
         subprocess.check_call(['make', 'build'])
-        return super(BuildWithMakefile, self).run()
+        if sys.version_info[0] < 3:
+            # Under Python 2.x, build_py is an old-style class.
+            return build_py.build_py.run(self)
+        return super().run()
 
 
 PACKAGE = 'django_xworkflows'
