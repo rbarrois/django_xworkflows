@@ -1,5 +1,7 @@
 include CREDITS ChangeLog LICENSE README.rst
 include requirements*.txt
+# Required for 'setup.py build'
+include Makefile
 
 graft django_xworkflows
 
@@ -9,4 +11,4 @@ prune tests
 
 global-exclude *.py[cod] __pycache__
 
-exclude Makefile tox.ini .flake8 manage.py
+exclude tox.ini .flake8 manage.py
