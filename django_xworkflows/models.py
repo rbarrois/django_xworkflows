@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 
 from django.apps import apps
 from django.db import models
+from django.db.models.query_utils import DeferredAttribute
 from django.db import transaction
 from django.conf import settings
 from django.contrib.contenttypes import fields as ct_fields
@@ -55,8 +56,9 @@ class StateFieldProperty(object):
     Similar to django.db.models.fields.subclassing.Creator, but doesn't raise
     AttributeError.
     """
-    def __init__(self, field):
+    def __init__(self, field, deferred_attr):
         self.field = field
+        self.deferred_attr = deferred_attr
 
     def __get__(self, instance, owner):
         """Retrieve the related attributed from a class / an instance.
@@ -65,6 +67,9 @@ class StateFieldProperty(object):
         from a class, return the workflow.
         """
         if instance:
+            if self.deferred_attr:
+                # use the DeferredAttribute descriptor to fetch the value
+                return self.deferred_attr.__get__(instance, owner)
             return instance.__dict__.get(self.field.name, self.field.workflow.initial_state)
         else:
             return self.field.workflow
@@ -110,7 +115,12 @@ class StateField(models.Field):
         Attaches a StateFieldProperty to wrap the attribute.
         """
         super(StateField, self).contribute_to_class(cls, name)
-        setattr(cls, self.name, StateFieldProperty(self))
+
+        cls_field = getattr(cls, self.name, None)
+        if not isinstance(cls_field, DeferredAttribute):
+            cls_field = None
+
+        setattr(cls, self.name, StateFieldProperty(self, cls_field))
 
     def to_python(self, value):
         """Converts the DB-stored value into a Python value."""
