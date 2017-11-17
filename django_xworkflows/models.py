@@ -70,7 +70,8 @@ class StateFieldProperty(object):
             if self.deferred_attr:
                 # use the DeferredAttribute descriptor to fetch the value
                 return self.deferred_attr.__get__(instance, owner)
-            return instance.__dict__.get(self.field.name, self.field.workflow.initial_state)
+            default = self.field.to_python(self.field.workflow.initial_state)
+            return instance.__dict__.get(self.field.name, default)
         else:
             return self.field.workflow
 
