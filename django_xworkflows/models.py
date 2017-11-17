@@ -72,7 +72,8 @@ class StateFieldProperty(object):
             if self.parent_property and hasattr(self.parent_property, '__get__'):
                 # We override a property.
                 return self.parent_property.__get__(instance, owner)
-            return instance.__dict__.get(self.field.name, self.field.workflow.initial_state)
+            default = self.field.to_python(self.field.workflow.initial_state)
+            return instance.__dict__.get(self.field.name, default)
         else:
             return self.field.workflow
 
