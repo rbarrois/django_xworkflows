@@ -148,7 +148,7 @@ class ModelTestCase(test.TestCase):
         self.assertEqual(1, len(models.MyWorkflowEnabled.objects.filter(state=bar)))
         self.assertEqual(0, len(models.MyWorkflowEnabled.objects.filter(state=baz)))
 
-        # Also test with only
+        # Also test with only()
         qs_only = models.MyWorkflowEnabled.objects.only('other')
         self.assertEqual([val.state.name for val in qs_only.filter(state=foo)], ['foo'])
         self.assertEqual([val.state.name for val in qs_only.filter(state=bar)], ['bar'])

@@ -55,16 +55,23 @@ class StateFieldProperty(object):
     Similar to django.db.models.fields.subclassing.Creator, but doesn't raise
     AttributeError.
     """
-    def __init__(self, field):
+    def __init__(self, field, parent_property):
         self.field = field
+        self.parent_property = parent_property
 
     def __get__(self, instance, owner):
         """Retrieve the related attributed from a class / an instance.
 
         If retrieving from an instance, return the actual value; if retrieving
         from a class, return the workflow.
+
+        When working on instances with a .only() queryset, the instance value
+        could be hidden behind a DeferredAttribute.
         """
         if instance:
+            if self.parent_property and hasattr(self.parent_property, '__get__'):
+                # We override a property.
+                return self.parent_property.__get__(instance, owner)
             return instance.__dict__.get(self.field.name, self.field.workflow.initial_state)
         else:
             return self.field.workflow
@@ -110,7 +117,9 @@ class StateField(models.Field):
         Attaches a StateFieldProperty to wrap the attribute.
         """
         super(StateField, self).contribute_to_class(cls, name)
-        setattr(cls, self.name, StateFieldProperty(self))
+
+        parent_property = getattr(cls, self.name, None)
+        setattr(cls, self.name, StateFieldProperty(self, parent_property))
 
     def to_python(self, value):
         """Converts the DB-stored value into a Python value."""

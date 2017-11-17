@@ -8,6 +8,7 @@ ChangeLog
 
     - Fix compatibility issue with Django>=1.11 migration framework when adding
       both a ``WorkflowEnabled`` model a ``ForeignKey`` to it.
+    - Properly interact with Django's .only() querysets.
 
 
 0.12.1 (2017-09-03)
