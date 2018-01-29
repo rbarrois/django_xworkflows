@@ -7,9 +7,6 @@ from __future__ import unicode_literals
 """Compatibility helpers."""
 
 
-import django
 import sys
 
 is_python2 = (sys.version_info[0] == 2)
-
-dj_major_minor = django.VERSION[:2]
