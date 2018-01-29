@@ -21,6 +21,23 @@ class ProjectWorkflow(xwf_models.Workflow):
     ]
 
 
+# Note: Some of the lines below end with a 'step:x,y,z' comment.
+# This comment marks that the line should only be included at migration
+# emulation step x, y and z.
+
+
+class Author(models.Model):                                         # step:2,3,4
+    name = models.CharField(max_length=100)                         # step:2,3,4
+
+
 class Project(xwf_models.WorkflowEnabled, models.Model):
     name = models.CharField(max_length=100)
     state = xwf_models.StateField(ProjectWorkflow)
+    author = models.OneToOneField(                                  # step:2,3,4
+        Author, null=True, on_delete=models.CASCADE)                # step:2,3,4
+
+
+class SubProject(xwf_models.WorkflowEnabled, models.Model):         # step:3,4
+    name = models.CharField(max_length=100)                         # step:3,4
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)  # step:3,4
+    state = xwf_models.StateField(ProjectWorkflow)                  # step:4

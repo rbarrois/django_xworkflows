@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import contextlib
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -373,7 +374,10 @@ class ProjectMigrationTests(test.TestCase):
     DEMO_PROJECT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'demo_project')
 
     def setUp(self):
+        self.debug = os.environ.get('DEBUG', '0') != '0'
         self.dirname = tempfile.mkdtemp(prefix='tmp_djxwf_tests_')
+        self.source_models = os.path.join(self.DEMO_PROJECT_PATH, 'workflow_app', 'models.py')
+        self.target_models = os.path.join(self.dirname, 'demo_project', 'workflow_app', 'models.py')
 
     def tearDown(self):
         def log_error(fn, path, excinfo):
@@ -388,13 +392,41 @@ class ProjectMigrationTests(test.TestCase):
             os.path.join(self.dirname, 'demo_project'),
         )
 
+    def step_models(self, step):
+        """Somewhat "patch" the models for this step.
+
+        Keep lines ending in '# step:x,y,z' where the current step is listed, or
+        unmarked lines.
+
+        This should allow us to test various changes, including adding/removing
+        models and fields.
+        """
+        CONDITIONAL_LINE_RE = r'^.*# step:(\d+,)*\d+$'
+        CONDITIONAL_STEP_LINE_RE = r'^.*# step:(\d+,)*{}(,\d+)*$'.format(step)
+        with open(self.source_models, 'r') as src:
+            lines = [
+                l for l in src
+                if (re.match(CONDITIONAL_STEP_LINE_RE, l.rstrip())
+                    or not re.match(CONDITIONAL_LINE_RE, l.rstrip()))
+            ]
+
+        if self.debug:
+            sys.stderr.write("\n>>> Writing lines matching step %d (%d lines).\n" % (step, len(lines)))
+        with open(self.target_models, 'w') as dst:
+            dst.write(''.join(lines))
+
     def test_makemigrations(self):
         self.setup_django_project()
         manage_py = os.path.join(self.dirname, 'demo_project', 'manage.py')
-        with extra_pythonpath(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))):
-            with override_env(DJANGO_SETTINGS_MODULE='demo_project.settings'):
-                subprocess.check_call([manage_py, 'makemigrations', '--verbosity=0'])
-                subprocess.check_call([manage_py, 'migrate', '--verbosity=0'])
+
+        verbosity_flag = '--verbosity=1' if self.debug else '--verbosity=0'
+
+        for step in [1, 2, 3, 4]:
+            self.step_models(step)
+            with extra_pythonpath(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))):
+                with override_env(DJANGO_SETTINGS_MODULE='demo_project.settings'):
+                    subprocess.check_call([manage_py, 'makemigrations', verbosity_flag, 'workflow_app'])
+                    subprocess.check_call([manage_py, 'migrate', verbosity_flag])
 
 
 class TemplateTestCase(test.TestCase):
