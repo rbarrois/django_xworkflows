@@ -154,7 +154,7 @@ class StateField(models.Field):
 
         Returns the state name.
         """
-        statefield = self.to_python(self._get_val_from_obj(obj))
+        statefield = self.to_python(self.value_from_object(obj))
         return statefield.state.name
 
     def validate(self, value, model_instance):

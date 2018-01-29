@@ -72,7 +72,7 @@ class WithTwoWorkflows(dxmodels.WorkflowEnabled, models.Model):
 
 class SomeWorkflowLastTransitionLog(dxmodels.BaseLastTransitionLog):
     MODIFIED_OBJECT_FIELD = 'obj'
-    obj = models.OneToOneField('djworkflows.SomeWorkflowEnabled')
+    obj = models.OneToOneField('djworkflows.SomeWorkflowEnabled', on_delete=models.CASCADE)
 
 
 class SomeWorkflow(dxmodels.Workflow):
