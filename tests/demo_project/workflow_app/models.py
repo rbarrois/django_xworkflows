@@ -26,18 +26,27 @@ class ProjectWorkflow(xwf_models.Workflow):
 # emulation step x, y and z.
 
 
-class Author(models.Model):                                         # step:2,3,4
-    name = models.CharField(max_length=100)                         # step:2,3,4
+class Author(models.Model):                                         # step:2,3,4,5
+    name = models.CharField(max_length=100)                         # step:2,3,4,5
 
 
 class Project(xwf_models.WorkflowEnabled, models.Model):
     name = models.CharField(max_length=100)
     state = xwf_models.StateField(ProjectWorkflow)
-    author = models.OneToOneField(                                  # step:2,3,4
-        Author, null=True, on_delete=models.CASCADE)                # step:2,3,4
+    author = models.OneToOneField(                                  # step:2,3,4,5
+        Author, null=True, on_delete=models.CASCADE)                # step:2,3,4,5
 
 
-class SubProject(xwf_models.WorkflowEnabled, models.Model):         # step:3,4
-    name = models.CharField(max_length=100)                         # step:3,4
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)  # step:3,4
-    state = xwf_models.StateField(ProjectWorkflow)                  # step:4
+class SubProject(xwf_models.WorkflowEnabled, models.Model):         # step:3,4,5
+    name = models.CharField(max_length=100)                         # step:3,4,5
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)  # step:3,4,5
+    state = xwf_models.StateField(ProjectWorkflow)                  # step:4,5
+
+
+class MetaProject(xwf_models.WorkflowEnabled, models.Model):        # step:5
+    name = models.CharField(max_length=100)                         # step:5
+    state = xwf_models.StateField(ProjectWorkflow)                  # step:5
+
+
+class MetaNote(models.Model):                                           # step:5
+    project = models.ForeignKey(MetaProject, on_delete=models.CASCADE)  # step:5

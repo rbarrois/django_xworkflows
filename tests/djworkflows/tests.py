@@ -421,12 +421,17 @@ class ProjectMigrationTests(test.TestCase):
 
         verbosity_flag = '--verbosity=1' if self.debug else '--verbosity=0'
 
-        for step in [1, 2, 3, 4]:
+        for step in [1, 2, 3, 4, 5]:
             self.step_models(step)
             with extra_pythonpath(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))):
                 with override_env(DJANGO_SETTINGS_MODULE='demo_project.settings'):
                     subprocess.check_call([manage_py, 'makemigrations', verbosity_flag, 'workflow_app'])
                     subprocess.check_call([manage_py, 'migrate', verbosity_flag])
+
+        # Run internal tests
+        with extra_pythonpath(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))):
+            with override_env(DJANGO_SETTINGS_MODULE='demo_project.settings'):
+                subprocess.check_call([manage_py, 'test', verbosity_flag, 'workflow_app'])
 
 
 class TemplateTestCase(test.TestCase):
