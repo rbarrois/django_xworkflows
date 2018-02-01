@@ -250,13 +250,26 @@ class BaseWorkflowEnabled(base.BaseWorkflowEnabled):
 #
 # class WorkflowEnabled(BaseWorkflowEnabled):
 #     __metaclass__ = WorkflowEnabledMeta
+#     class Meta:
+#         abstract = True
 #
 # Python3
 #
 # class WorkflowEnabled(metaclass=WorkflowEnabledMeta):
-#     pass
+#     class Meta:
+#         abstract = True
 
-WorkflowEnabled = WorkflowEnabledMeta(str('WorkflowEnabled'), (BaseWorkflowEnabled,), {'__module__': __name__})
+
+class _DjangoWorkflowEnabledMeta:
+    """<class Meta> for the 'class WorkflowEnabled' declaration."""
+    abstract = True
+
+
+WorkflowEnabled = WorkflowEnabledMeta(
+    str('WorkflowEnabled'),
+    (BaseWorkflowEnabled, models.Model),
+    {'__module__': __name__, 'Meta': _DjangoWorkflowEnabledMeta},
+)
 
 
 def get_default_log_model():
