@@ -4,7 +4,10 @@ ChangeLog
 0.12.2 (unreleased)
 -------------------
 
-- Nothing changed yet.
+*Bugfix:*
+
+    - Fix compatibility issue with Django>=1.11 migration framework when adding
+      both a ``WorkflowEnabled`` model a ``ForeignKey`` to it.
 
 
 0.12.1 (2017-09-03)
