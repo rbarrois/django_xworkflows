@@ -69,7 +69,7 @@ setup(
         'setuptools>=0.8',
     ],
     install_requires=[
-        'Django>=1.11',
+        'Django',
         'xworkflows',
     ],
     classifiers=[

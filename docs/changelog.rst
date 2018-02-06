@@ -4,7 +4,10 @@ ChangeLog
 0.12.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
+*Packaging:*
+
+    - Don't require Django>=1.11 - we don't test for Django<1.11, but should be
+      compatible. This requirement change should never have made it into a patch release.
 
 
 0.12.2 (2018-02-05)
