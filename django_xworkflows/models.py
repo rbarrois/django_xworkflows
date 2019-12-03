@@ -16,9 +16,19 @@ from django.core import exceptions
 from django.forms import fields
 from django.forms import widgets
 from django.utils.deconstruct import deconstructible
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+
+try:
+    from django.utils.encoding import python_2_unicode_compatible
+except ImportError:
+    try:
+        from six import python_2_unicode_compatible
+    except ImportError:
+        raise exceptions.ImproperlyConfigured(
+            'Starting from django 3.0, you must provide your own installation '
+            'of the `six` package.')
 
 from xworkflows import base
 
