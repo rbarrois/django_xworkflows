@@ -57,11 +57,6 @@ release:
 testall:
 	tox
 
-# DOC: Run tests for the currently installed version
-test: build
-	PYTHONPATH=. python -Wdefault $(TESTS_DIR)/runner.py
-
-
 
 # Note: we run the linter in two runs, because our __init__.py files has specific warnings we want to exclude
 # DOC: Perform code quality tasks
@@ -78,7 +73,7 @@ coverage:
 	$(COVERAGE) html "--include=$(PACKAGE)/*.py,$(TESTS_DIR)/*.py"
 
 
-.PHONY: test testall lint coverage
+.PHONY: testall lint coverage
 
 
 # Documentation
