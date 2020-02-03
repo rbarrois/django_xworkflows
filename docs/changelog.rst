@@ -1,10 +1,13 @@
 ChangeLog
 =========
 
-0.12.4 (unreleased)
+0.13.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+0.13.0 (2020-03-02)
+-------------------
+
+- Add support for Django 2.2
 
 
 0.12.3 (2018-02-06)
