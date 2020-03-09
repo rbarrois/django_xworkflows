@@ -1,10 +1,13 @@
 ChangeLog
 =========
 
-0.12.4 (unreleased)
--------------------
+1.0.0 (unreleased)
+------------------
 
-- Nothing changed yet.
+*New:*
+
+    - Add compatibility for Django up to 3.0
+    - Drop support for Python 2
 
 
 0.12.3 (2018-02-06)
