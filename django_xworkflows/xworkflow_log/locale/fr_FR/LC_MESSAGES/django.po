@@ -1,5 +1,5 @@
 # Locale for django-xworkflows.
-# Copyright (C) 2011 Raphaël Barrois
+# Copyright (C) 2011-2020 Raphaël Barrois
 # This file is distributed under the same license as the django-xworkflows package.
 # Raphaël Barrois <raphael.barrois@xelmail.com> 2011.
 #
