@@ -69,7 +69,7 @@ setup(
         'setuptools>=0.8',
     ],
     install_requires=[
-        'Django',
+        'Django>=1.11',
         'xworkflows',
     ],
     classifiers=[
@@ -78,13 +78,17 @@ setup(
         "License :: OSI Approved :: BSD License",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Operating System :: OS Independent",
+        "Framework :: Django :: 1.11",
+        "Framework :: Django :: 2.0",
+        "Framework :: Django :: 2.1",
+        "Framework :: Django :: 2.2",
+        "Framework :: Django :: 3.0",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
     test_suite='tests.runner.runtests',
     zip_safe=False,  # Prevent distribution as eggs for South.
