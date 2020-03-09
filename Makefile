@@ -5,7 +5,6 @@ DOC_DIR=docs
 # Use current python binary instead of system default.
 COVERAGE = python $(shell which coverage)
 FLAKE8 = flake8
-MANAGE_PY = python manage.py
 DJANGO_ADMIN = django-admin.py
 PO_FILES = $(shell find $(PACKAGE) -name '*.po')
 MO_FILES = $(PO_FILES:.po=.mo)
@@ -59,7 +58,7 @@ testall:
 
 # DOC: Run tests for the currently installed version
 test: build
-	PYTHONPATH=. python -Wdefault $(TESTS_DIR)/runner.py
+	python -Wdefault ./manage.py test tests.djworkflows.tests
 
 
 

@@ -112,12 +112,14 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'migration_helper.urls'
+ROOT_URLCONF = 'dev.urls'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sites',
+    'tests.djworkflows',
+    'django_xworkflows',
     'django_xworkflows.xworkflow_log',
 )
 
