@@ -15,7 +15,7 @@ from django.forms import fields
 from django.forms import widgets
 from django.utils.deconstruct import deconstructible
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from xworkflows import base
 
@@ -289,9 +289,7 @@ def get_default_log_model():
 
 class DjangoImplementationWrapper(base.ImplementationWrapper):
     """Restrict execution of transitions within templates"""
-    # django < 1.4
     alters_data = True
-    # django >= 1.4
     do_not_call_in_templates = True
 
 
