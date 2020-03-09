@@ -2,8 +2,6 @@
 # Copyright (c) 2011-2020 Raphaël Barrois
 # This code is distributed under the two-clause BSD license.
 
-from __future__ import unicode_literals
-
 """Specific versions of XWorkflows to use with Django."""
 
 from django.apps import apps
@@ -16,7 +14,6 @@ from django.core import exceptions
 from django.forms import fields
 from django.forms import widgets
 from django.utils.deconstruct import deconstructible
-from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -249,7 +246,7 @@ class BaseWorkflowEnabled(base.BaseWorkflowEnabled):
     def _get_FIELD_display(self, field):
         if isinstance(field, StateField):
             value = getattr(self, field.attname)
-            return force_text(value.title)
+            return str(value.title)
         else:
             return super(BaseWorkflowEnabled, self)._get_FIELD_display(field)
 
@@ -423,7 +420,6 @@ class Workflow(base.Workflow):
             self.db_log(transition, from_state, instance, *args, **kwargs)
 
 
-@python_2_unicode_compatible
 class BaseTransitionLog(models.Model):
     """Abstract model for a minimal database logging setup.
 

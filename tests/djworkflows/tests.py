@@ -2,8 +2,6 @@
 # Copyright (c) 2011-2020 Raphaël Barrois
 # This code is distributed under the two-clause BSD license.
 
-from __future__ import unicode_literals
-
 import contextlib
 import os
 import re
@@ -26,14 +24,6 @@ from django_xworkflows import models as xwf_models
 from django_xworkflows.xworkflow_log import models as xwlog_models
 
 from . import models
-
-
-if sys.version_info[0] <= 2:
-    def text_type(text):
-        return unicode(text)  # noqa: F821
-else:
-    def text_type(text):
-        return str(text)
 
 
 @contextlib.contextmanager
@@ -250,7 +240,7 @@ class TransitionTestCase(test.TransactionTestCase):
         self.assertEqual('foo', trlog.from_state)
         self.assertEqual('bar', trlog.to_state)
 
-        self.assertIn('foo -> bar', text_type(trlog))
+        self.assertIn('foo -> bar', str(trlog))
 
     def test_no_logging(self):
         """Tests disabled transition logs."""
@@ -442,8 +432,8 @@ class ProjectMigrationTests(test.TestCase):
 class TemplateTestCase(test.TestCase):
     """Tests states and transitions behavior in templates."""
 
-    uTrue = text_type(True)
-    uFalse = text_type(False)
+    uTrue = str(True)
+    uFalse = str(False)
 
     def setUp(self):
         self.obj = models.MyWorkflowEnabled()
@@ -480,11 +470,11 @@ class TemplateTestCase(test.TestCase):
         self.assertTrue(self.obj.foobar.do_not_call_in_templates)
 
     def test_transaction_attributes(self):
-        self.assertEqual(self.render_fragment("{{ obj.foobar|safe}}"), text_type(self.obj.foobar))
+        self.assertEqual(self.render_fragment("{{ obj.foobar|safe}}"), str(self.obj.foobar))
         self.assertEqual(self.render_fragment("{{ obj.foobar.is_available }}"), self.uTrue)
         self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
 
-        self.assertEqual(self.render_fragment("{{ obj.bazbar|safe}}"), text_type(self.obj.bazbar))
+        self.assertEqual(self.render_fragment("{{ obj.bazbar|safe}}"), str(self.obj.bazbar))
         self.assertEqual(self.render_fragment("{{ obj.bazbar.is_available }}"), self.uFalse)
         self.assertEqual(models.MyWorkflow.states.foo, self.obj.state)
 
