@@ -1,7 +1,7 @@
 django-xworkflows documentation
 ===============================
 
-django-xworkflows is a django application adding `xworkflows <http://github.com/rbarrois/xworkflows/>`_ functionnalities to
+django-xworkflows is a django application adding `xworkflows <http://github.com/rbarrois/xworkflows/>`_ functionalities to
 django models.
 
 
