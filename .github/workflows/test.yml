@@ -21,6 +21,10 @@ jobs:
           - django111
           - django22
           - django30
+        exclude:
+          # Django 3.0 requires Python>=3.6
+          - python-version: 3.5
+            tox-environment: django30
 
     env:
       TOXENV: ${{ matrix.tox-environment }}
