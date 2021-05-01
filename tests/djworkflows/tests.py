@@ -400,9 +400,9 @@ class ProjectMigrationTests(test.TestCase):
         CONDITIONAL_STEP_LINE_RE = r'^.*# step:(\d+,)*{}(,\d+)*$'.format(step)
         with open(self.source_models, 'r') as src:
             lines = [
-                l for l in src
-                if (re.match(CONDITIONAL_STEP_LINE_RE, l.rstrip())
-                    or not re.match(CONDITIONAL_LINE_RE, l.rstrip()))
+                line for line in src
+                if (re.match(CONDITIONAL_STEP_LINE_RE, line.rstrip())
+                    or not re.match(CONDITIONAL_LINE_RE, line.rstrip()))
             ]
 
         if self.debug:
