@@ -4,10 +4,12 @@ include Makefile
 
 graft django_xworkflows
 
-prune dev
-prune docs
-prune tests
+graft dev
+graft docs
+graft tests
+
+prune docs/_build
 
 global-exclude *.py[cod] __pycache__
 
-exclude tox.ini .flake8 manage.py
+include tox.ini .flake8 manage.py
