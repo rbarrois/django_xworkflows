@@ -50,11 +50,12 @@ class MyWorkflowEnabled(dxmodels.WorkflowEnabled, models.Model):
     state = dxmodels.StateField(MyWorkflow)
     other = models.CharField(max_length=4, choices=OTHER_CHOICES)
 
+    @xworkflows.after_transition("gobaz")
     def fail_if_fortytwo(self, res, *args, **kwargs):
         if res == 42:
             raise ValueError()
 
-    @dxmodels.transition(after=fail_if_fortytwo)
+    @dxmodels.transition()
     def gobaz(self, foo, save=True):
         return foo * 2
 
