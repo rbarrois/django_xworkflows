@@ -35,7 +35,7 @@ build: $(MO_FILES)
 	cd $(abspath $(dir $<)/../../..) && $(DJANGO_ADMIN) compilemessages
 
 # DOC: Install and/or upgrade dependencies
-update:
+setup-dev:
 	pip install --upgrade pip setuptools
 	pip install --upgrade -r requirements_dev.txt
 	pip freeze
@@ -45,7 +45,7 @@ release:
 	fullrelease
 
 
-.PHONY: all default clean build update release
+.PHONY: all default clean build setup-dev release
 
 
 # Tests and quality
