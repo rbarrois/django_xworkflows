@@ -1,5 +1,4 @@
 include CREDITS ChangeLog LICENSE README.rst
-include requirements*.txt
 # Required for 'setup.py build'
 include Makefile
 
