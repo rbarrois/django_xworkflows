@@ -58,7 +58,7 @@ testall:
 
 # DOC: Run tests for the currently installed version
 test: build
-	python -Wdefault ./manage.py test tests.djworkflows.tests
+	python -Werror ./manage.py test tests.djworkflows.tests
 
 
 
