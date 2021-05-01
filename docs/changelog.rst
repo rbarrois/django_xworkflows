@@ -4,7 +4,10 @@ ChangeLog
 1.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+*New:*
+
+    - Test against Django 3.1, 3.2
+    - Test against Python 3.8, 3.9
 
 
 1.0.0 (2020-03-09)

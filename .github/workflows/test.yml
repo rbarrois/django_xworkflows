@@ -13,18 +13,16 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.5
           - 3.6
           - 3.7
+          - 3.8
+          - 3.9
           - pypy3
         tox-environment:
-          - django111
+          # Previous LTS
           - django22
-          - django30
-        exclude:
-          # Django 3.0 requires Python>=3.6
-          - python-version: 3.5
-            tox-environment: django30
+          # Latest release
+          - django32
 
     env:
       TOXENV: ${{ matrix.tox-environment }}
